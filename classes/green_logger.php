@@ -1,17 +1,12 @@
 <?php
 
-define ('LOG_LEVEL_VERBOSE',1);
-define ('LOG_LEVEL_NORMAL',2);
-define ('LOG_LEVEL_NONE',3);	# why would you ever need this ??
-define ('LOG_LEVEL_OUT',99);
-
 Class green_logger {
 	
 	private $path;
 	private $sep;
 	private $level = LOG_LEVEL_NORMAL;
 	
-	function __construct($name,$sep='^') {
+	function __construct($name,$logLevel,$sep='^') {
 		$this->sep=$sep;
 		$this->buildPath($name);
    	}
@@ -35,7 +30,7 @@ Class green_logger {
 		if($this->level == LOG_LEVEL_OUT){
 			print $this->formatMessage($msg);
 		} elseif($level >= $this->level && $this->level != LOG_LEVEL_NONE){
-			error_log ($this->formatMessage($msg),3,$this->path);
+			return error_log ($this->formatMessage($msg),3,$this->path);
 		}
 	}
 	

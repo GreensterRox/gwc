@@ -6,9 +6,9 @@ Class green_logger_factory {
 		
    	}
 	
-	public static function create($name){
+	public static function create($name,$logLevel,$args){
 		include_once('green_logger.php');
-		return new green_logger($name);
+		return new green_logger($name,$logLevel);
 	}
 	
 };

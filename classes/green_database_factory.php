@@ -6,7 +6,7 @@ Class green_database_factory {
 		
    	}
 	
-	public static function create($name){
+	public static function create($name,$debug,$args){
 		
 	}
 	

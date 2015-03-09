@@ -6,7 +6,7 @@ Class green_template_factory {
 		
    	}
 	
-	public static function create($name){
+	public static function create($name,$logger,$args){
 		
 	}
 	
