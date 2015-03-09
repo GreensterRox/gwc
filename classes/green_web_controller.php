@@ -18,6 +18,7 @@ Class green_web_controller {
 	protected $SESSION;
 	private $args;
 	private $debug;
+	private $root;
 	private $factories = array('logger','template','database','session');	// become upper case properties / logger must be first
 	private $siteName = 'unknown_site';
 	
@@ -26,19 +27,16 @@ Class green_web_controller {
 		$this->debug = $debug;
    	}
 	
-	public function handleRequest($args=array()){
+	public function handleRequest($root,$args=array()){
+		
+		$this->root = $root;
 		
 		$this->args = $args;
 		
+		# TO DO - this is going to need to look for a config in /root/sites/site_name/conf/conf.php << db creds stored here
 		$this->detectSite();
 		
 		$this->createRequestObjects();
-	}
-	
-	private function parseArgs($args){
-		if(isset($args['session_args'])){
-			$this->session_args = $args['session_args'];
-		}
 	}
 	
 	## Using the web request, detect the site
@@ -83,6 +81,7 @@ Class green_web_controller {
 		} else {
 			$args=array();
 		}
+		$args['root_dir'] = $this->root;
 		$this->TEMPLATE = green_template_factory::create($this->siteName,$this->LOGGER,$args);
 	}
 	
@@ -93,7 +92,7 @@ Class green_web_controller {
 		} else {
 			$args=array();
 		}
-		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,$args);
+		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,'mysql',$args);
 	}
 	
 	
@@ -119,6 +118,14 @@ Class green_web_controller {
 	
 	public function sessionId(){
 		return $this->SESSION->getSessionId();
+	}
+	
+	public function templatePut($key,$value){
+		$this->TEMPLATE->addVar($key,$value);
+	}
+	
+	public function render($path){
+		return $this->TEMPLATE->render($path);
 	}
 	
 	## Cleanup

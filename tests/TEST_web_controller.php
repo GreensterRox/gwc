@@ -12,7 +12,7 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$this->GWC = new green_web_controller($debug=true);
 		// run-time args
 		$args['session']['session_mock'] = true;		// don't actually start a session
-		$this->GWC->handleRequest($args);
+		$this->GWC->handleRequest('/data/green_software/green_framework/',$args);
 		
     }
 	
@@ -21,9 +21,6 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($this->GWC->log('Test we can log '.__FILE__));
 	}
 	
-	
-	## Doesn't work because out already started by phpunit
-	## TO DO figure a way round this
 	public function testWeCanWriteToSession(){
 
 		# Test we can initiate a session
@@ -37,6 +34,23 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($value,$retrievedValue);
 	}
 
+	public function testWeCanRenderTemplate(){
+		# Test we can render from a template
+		ob_start();
+		$this->GWC->render('unit_test.html');
+		$contents = ob_get_clean();
+		$this->assertEquals($contents,'<html><head><title>Unit Test Template</title></head><body>Unit Test Template</body></html>');
+		
+		# now test we can render variables
+		$this->GWC->templatePut('title','GWC');
+		$this->GWC->templatePut('author','Adrian Green');
+		ob_start();
+		$this->GWC->render('unit_test2.html');
+		$contents = ob_get_clean();
+		$this->assertEquals($contents,'<html><head><title>GWC Unit Test Template</title></head><body>GWC Framework by Adrian Green</body></html>'."\n");
+		
+	}
+	
 	protected function tearDown()
     {
 		# close db, session, etc
