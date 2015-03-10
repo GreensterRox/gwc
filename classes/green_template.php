@@ -10,7 +10,10 @@ Class green_template {
 	function __construct($name,$logger,$templateDir) {
 		$this->logger = $logger;
 		$this->name = $name;
-		$this->templateDir = $templateDir.'/sites/'.$this->name.'/templates/';
+		if(empty($templateDir)){
+			$this->fail('No template directory configured for this site ['.$name.']');
+		}
+		$this->templateDir = $templateDir;
 		$this->logger->log('TEMPLATE: Initialising template engine using root directory ['.$templateDir.']',LOG_LEVEL_VERBOSE);
    	}
    	
@@ -28,6 +31,10 @@ Class green_template {
    		include($template);
    	}
    	
+   	private function fail($msg){
+   		$this->logger->log('TEMPLATE: '.$msg);
+   		throw new Exception($msg);
+   	}
 	
 }
 ?>

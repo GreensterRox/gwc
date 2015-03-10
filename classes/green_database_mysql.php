@@ -3,48 +3,59 @@
 Class green_database_mysql {
 	
 	private $logger;
-	private $name;
+	private $conn;
 	
-	function __construct($name,$logger) {
+	function __construct($logger) {
 		$this->logger = $logger;
-		
-		$this-connect();
    	}
 	
-	private function connect(){
-		$this->logger->log('DATABASE: Connecting to [??]',LOG_LEVEL_VERBOSE);
-		
-		# TO DO implement this
-		$servername = "localhost";
-		$username = "username";
-		$password = "password";
-		$dbname = "myDB";
+	public function connect($dbServer,$dbName,$dbUsername,$dbPassword){
+		$this->logger->log('DATABASE: Connecting to ['.$dbUsername.'@'.$dbServer.'/'.$dbName.'] ',LOG_LEVEL_VERBOSE);
 		
 		// Create connection
-		$conn = new mysqli($servername, $username, $password, $dbname);
+		$conn = new mysqli($dbServer, $dbUsername, $dbPassword, $dbName);
 		// Check connection
-		if ($conn->connect_error) {
-		    die("Connection failed: " . $conn->connect_error);
+		if (!$conn) {
+		    $this->logger->log("DATABASE: Connection failed: " . $conn->connect_error,LOG_LEVEL_NORMAL);
+		    $this->fail('Unable to connect to the database - please check the settings');
 		}
 		
-		// sql to create table
-		$sql = "CREATE TABLE MyGuests (
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		firstname VARCHAR(30) NOT NULL,
-		lastname VARCHAR(30) NOT NULL,
-		email VARCHAR(50),
-		reg_date TIMESTAMP
-		)";
-		
-		if ($conn->query($sql) === TRUE) {
-		    echo "Table MyGuests created successfully";
-		} else {
-		    echo "Error creating table: " . $conn->error;
-		}
-		
-		$conn->close();
+		$this->conn = $conn;
 	}
 	
+	public function query($sql,$vars){
+		$this->logger->log("DATABASE: " . $this->renderWithVars($sql,$vars),LOG_LEVEL_VERBOSE);
+		$success = $this->conn->query($sql);
+		if (!$success) {
+		    $this->logger->log("DATABASE: Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+		}
+		return $success;
+	}
+	
+	# queries and returns rows in associated array
+	# TO DO handle prepared statements
+	public function fetch($sql,$vars){
+		$result = $this->query($sql,$vars);
+		$rowSet = array();
+		
+		if($result){
+			if()
+			while ($row = $result->fetch_assoc()) {
+			    echo " id = " . $row['id'] . "\n";
+			}
+		}
+	}
+	
+	private function fail($msg){
+   		$this->logger->log('DATABASE: '.$msg);
+   		throw new Exception($msg);
+   	}
+	
+	function __destruct() {
+		if($this->conn){
+       		$this->conn->close();
+    	}
+   	}
 }
 
 ?>

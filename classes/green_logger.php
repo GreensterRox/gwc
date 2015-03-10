@@ -9,6 +9,7 @@ Class green_logger {
 	function __construct($name,$logLevel,$sep='^') {
 		$this->sep=$sep;
 		$this->buildPath($name);
+		$this->level=$logLevel;
    	}
 	
 	private function buildPath($name){

@@ -8,7 +8,7 @@ Class green_template_factory {
 	
 	public static function create($name,$logger,$args){
 		include_once('green_template.php');
-		return new green_template($name,$logger,$args['root_dir']);
+		return new green_template($name,$logger,$args['directory']);
 	}
 	
 };

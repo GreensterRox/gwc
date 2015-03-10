@@ -19,31 +19,55 @@ Class green_web_controller {
 	private $args;
 	private $debug;
 	private $root;
-	private $factories = array('logger','template','database','session');	// become upper case properties / logger must be first
+	private $factories = array('logger','template','database','session');
 	private $siteName = 'unknown_site';
 	
 
-	function __construct($debug=false) {
-		$this->debug = $debug;
+	function __construct() {
+		
    	}
 	
-	public function handleRequest($root,$args=array()){
-		
-		$this->root = $root;
-		
-		$this->args = $args;
-		
-		# TO DO - this is going to need to look for a config in /root/sites/site_name/conf/conf.php << db creds stored here
+	public function handleRequest($objects=array()){
+		$this->setRoot();
 		$this->detectSite();
-		
-		$this->createRequestObjects();
+		if(!empty($objects)){
+			// basically allows me to test in isolation (but we always need the logger!)
+			$this->createLogger();
+			if(isset($objects['template'])){
+				$this->createTemplate();
+			}
+			if(isset($objects['database'])){
+				$this->createDatabase();
+			}
+			if(isset($objects['session'])){
+				$this->createSession();
+			}
+		} else {
+			$this->createRequestObjects();
+		}
 	}
 	
 	## Using the web request, detect the site
 	private function detectSite(){
-		if(!empty($_SERVER['HTTP_HOST'])){
-			$this->siteName = $_SERVER['HTTP_HOST'];
+		if(empty($_SERVER['HTTP_HOST'])){
+			throw new Exception ('Unable to detect site host');
 		}
+		$this->siteName = $_SERVER['HTTP_HOST'];
+		$this->loadProps($this->siteName);
+	}
+	
+	private function loadProps($name){
+		$siteConfig = $this->root.'/sites/'.$name.'.config.php';
+		if(!file_exists($siteConfig)){
+			throw new Exception('Cannot find site config file here: '.$this->root.'/sites/'.$name.'.config.php');
+		}
+		include($siteConfig);
+		$this->args = $CONFIG;
+		$this->debug = (isset($this->args['options']['debug']) ? $this->args['options']['debug'] : false);
+	}
+	
+	private function setRoot(){
+		$this->root = str_replace('classes/green_web_controller.php','',__FILE__);
 	}
 	
 	private function createRequestObjects(){
@@ -81,7 +105,6 @@ Class green_web_controller {
 		} else {
 			$args=array();
 		}
-		$args['root_dir'] = $this->root;
 		$this->TEMPLATE = green_template_factory::create($this->siteName,$this->LOGGER,$args);
 	}
 	
@@ -92,13 +115,13 @@ Class green_web_controller {
 		} else {
 			$args=array();
 		}
-		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,'mysql',$args);
+		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,$args);
 	}
 	
 	
 	private function getLogLevel($debug){
 		if($debug){
-			return LOG_LEVEL_VERBOSE;	## to do these are in logger class not facotry class - how do we preload this crap (put them in GWC class ?!)
+			return LOG_LEVEL_VERBOSE;
 		} else {
 			return LOG_LEVEL_NORMAL;
 		}
@@ -126,6 +149,10 @@ Class green_web_controller {
 	
 	public function render($path){
 		return $this->TEMPLATE->render($path);
+	}
+	
+	public function query($query,$vars=array()){
+		return $this->DATABASE->fetch($query,$vars);
 	}
 	
 	## Cleanup

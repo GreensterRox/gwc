@@ -35,5 +35,10 @@ Class green_session {
    		$this->sessionId = '1234';
    	}
    	
+   	private function fail($msg){
+   		$this->logger->log('SESSION: '.$msg);
+   		throw new Exception($msg);
+   	}
+   	
 }
 ?>
