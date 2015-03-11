@@ -5,7 +5,7 @@
 	
 	# DB Creds
 	$CONFIG['database']['server'] = 'localhost';
-	$CONFIG['database']['name'] = 'gwc';
+	$CONFIG['database']['name'] = 'gwc_test';
 	$CONFIG['database']['username'] = 'test_user';
 	$CONFIG['database']['password'] = '0nlyth3br4v3gwc';
 	

@@ -1,8 +1,8 @@
-CREATE DATABASE gwc;
-use gwc;
+CREATE DATABASE gwc_test;
+use gwc_test;
 
 CREATE USER 'test_user'@'localhost' IDENTIFIED BY '0nlyth3br4v3gwc';
-GRANT SELECT,INSERT,UPDATE,DELETE ON gwc.unit_test TO 'test_user'@'localhost';
+GRANT ALL PRIVILEGES ON gwc_test.* TO 'test_user'@'localhost';
 
 CREATE TABLE IF NOT EXISTS unit_test(
 	id int PRIMARY KEY auto_increment,

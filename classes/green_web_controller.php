@@ -151,9 +151,14 @@ Class green_web_controller {
 		return $this->TEMPLATE->render($path);
 	}
 	
-	public function query($query,$vars=array()){
-		return $this->DATABASE->fetch($query,$vars);
+	public function query($sql,$vars=array()){
+		return $this->DATABASE->query($sql,$vars);
 	}
+	
+	public function rawQuery($sql){
+		return $this->DATABASE->rawQuery($sql);
+	}
+	
 	
 	## Cleanup
 	function __destruct() {

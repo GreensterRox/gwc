@@ -59,11 +59,17 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 	
 	public function testWeCanConnectToDatabase(){
 		
+		# TO DO - test should create table and destroy it again
 		$GWC = new green_web_controller($debug=true);
 		$GWC->handleRequest(array('database'=>true));
 		
-		$rs = $GWC->query('SELECT * FROM unit_test LIMIT 1');
+		# test database commands
+		$rs = $GWC->rawQuery('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
+		
 		die(var_dump($rs));
+		
+		$rs = $GWC->rawQuery('DROP TABLE IF EXISTS user_test');
+		
 	}
 	
 	protected function tearDown()
