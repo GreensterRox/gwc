@@ -1,6 +1,11 @@
 <?php
 include_once('/data/green_software/green_framework/classes/green_web_controller.php');
 
+/*
+**
+** Test fundamental usage of the GWC framework
+**
+*/
 
 class WebControllerTest extends PHPUnit_Framework_TestCase
 {
@@ -57,21 +62,33 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		
 	}
 	
-	public function testWeCanConnectToDatabase(){
+	public function testWeCanReadAndWriteDatabase(){
 		
-		# TO DO - test should create table and destroy it again
 		$GWC = new green_web_controller($debug=true);
 		$GWC->handleRequest(array('database'=>true));
 		
-		# test database commands
-		$rs = $GWC->rawQuery('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
+		# TO DO - Implement transactions in gwc
 		
-		die(var_dump($rs));
+		$rs = $GWC->DBWrite('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
+		$this->assertEquals($rs,true);
 		
-		$rs = $GWC->rawQuery('DROP TABLE IF EXISTS user_test');
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$this->assertEquals($rs,true);
+		
+		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Adrian Green'));
+		$this->assertEquals($rs[0]['value'],"Adrian Green");
+		
+		# negative test
+		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Mr. Grinch'));
+		$this->assertEmpty($rs);
+		
+		$rs = $GWC->DBWrite('DROP TABLE IF EXISTS user_test');
+		$this->assertEquals($rs,true);
+		
+		
 		
 	}
-	
+
 	protected function tearDown()
     {
 		# close db, session, etc

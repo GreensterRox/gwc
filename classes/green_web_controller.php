@@ -121,6 +121,7 @@ Class green_web_controller {
 	
 	private function getLogLevel($debug){
 		if($debug){
+			##return LOG_LEVEL_OUT;
 			return LOG_LEVEL_VERBOSE;
 		} else {
 			return LOG_LEVEL_NORMAL;
@@ -151,12 +152,20 @@ Class green_web_controller {
 		return $this->TEMPLATE->render($path);
 	}
 	
-	public function query($sql,$vars=array()){
-		return $this->DATABASE->query($sql,$vars);
+	public function DBRead($sql,$params=array()){
+		try {
+			return $this->DATABASE->read($sql,$params);
+		} catch(Exception $ex){
+			return $this->LOGGER->log("Cannot Read from Database: ".$ex->getMessage(),$level=LOG_LEVEL_NORMAL);
+		}
 	}
 	
-	public function rawQuery($sql){
-		return $this->DATABASE->rawQuery($sql);
+	public function DBWrite($sql){
+		try{
+			return $this->DATABASE->write($sql);
+		} catch(Exception $ex){
+			return $this->LOGGER->log("Cannot Write to Database: ".$ex->getMessage(),$level=LOG_LEVEL_NORMAL);
+		}
 	}
 	
 	
