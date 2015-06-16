@@ -28,7 +28,10 @@ Class green_template {
    		}
    		$template = $this->templateDir.$path;
    		$this->logger->log('TEMPLATE: Rendering ['.$template.']',LOG_LEVEL_VERBOSE);
-   		include($template);
+   		if(file_exists($template)){
+   			include($template);
+   		}
+   		$this->fail('Template ['.$template.'] not found');
    	}
    	
    	private function fail($msg){

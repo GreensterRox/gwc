@@ -67,8 +67,6 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$GWC = new green_web_controller($debug=true);
 		$GWC->handleRequest(array('database'=>true));
 		
-		# TO DO - Implement transactions in gwc
-		
 		$rs = $GWC->DBWrite('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
 		$this->assertEquals($rs,true);
 		
@@ -86,6 +84,64 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($rs,true);
 		
 		
+		
+	}
+
+	public function testDatabaseTransactions(){
+		
+		$GWC = new green_web_controller($debug=true);
+		$GWC->handleRequest(array('database'=>true));
+		
+		// Make sure this doesn't exist before doing any further tests
+		$rs = $GWC->DBWrite('DROP TABLE IF EXISTS user_test');
+		$this->assertEquals($rs,true);
+		
+		$rs = $GWC->DBWrite('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
+		$this->assertEquals($rs,true);
+		
+		$GWC->DBStartTransaction();
+		
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$this->assertEquals($rs,true);
+		
+		$GWC->DBCommit();
+		
+		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Adrian Green'));
+		$this->assertEquals($rs[0]['value'],"Adrian Green");
+		
+		# negative test
+		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Mr. Grinch'));
+		$this->assertEmpty($rs);
+		
+		$rs = $GWC->DBWrite('DROP TABLE IF EXISTS user_test');
+		$this->assertEquals($rs,true);	
+		
+	}
+
+	public function testDatabaseRollback(){
+		
+		$GWC = new green_web_controller($debug=true);
+		$GWC->handleRequest(array('database'=>true));
+		
+		// Make sure this doesn't exist before doing any further tests
+		$rs = $GWC->DBWrite('DROP TABLE IF EXISTS user_test');
+		$this->assertEquals($rs,true);
+		
+		$rs = $GWC->DBWrite('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
+		$this->assertEquals($rs,true);
+		
+		$GWC->DBStartTransaction();
+			
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$this->assertEquals($rs,true);
+		
+		$GWC->DBRollback();
+		
+		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Adrian Green'));
+		$this->assertEmpty($rs);
+		
+		$rs = $GWC->DBWrite('DROP TABLE IF EXISTS user_test');
+		$this->assertTrue($rs);	
 		
 	}
 

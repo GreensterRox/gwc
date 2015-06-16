@@ -65,16 +65,45 @@ Class green_database_mysql {
 		return $sql;
 	}
 	
-	# queries and returns rows in associated array
-	# TO DO handle prepared statements
-	public function xxxquery($sql,$vars){
-		$result = $this->query($sql,$vars);
-		$rowSet = array();
-		
-		if($result){
-			while ($row = $result->fetch_assoc()) {
-			    echo " id = " . $row['id'] . "\n";
+	public function startTransaction(){
+		$this->logger->log("DATABASE (startTransaction): ",LOG_LEVEL_VERBOSE);
+		try {
+			$res = $this->conn->beginTransaction();
+			if(!$res){
+				$this->logger->log("DATABASE: Begin Transaction failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    	$this->fail('Unable to begin transaction');
 			}
+		} catch(PDOException $ex){
+			$this->logger->log("DATABASE: Begin Transaction failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    $this->fail('Unable to begin transaction');
+		}
+	}
+	
+	public function commit(){
+		$this->logger->log("DATABASE (commit): ",LOG_LEVEL_VERBOSE);
+		try {
+			$res = $this->conn->commit();
+			if(!$res){
+				$this->logger->log("DATABASE: Commit failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    	$this->fail('Unable to begin transaction');
+			}
+		} catch(PDOException $ex){
+			$this->logger->log("DATABASE: Commit failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    $this->fail('Unable to begin transaction');
+		}
+	}
+	
+	public function rollback(){
+		$this->logger->log("DATABASE (rollback): ",LOG_LEVEL_VERBOSE);
+		try {
+			$res = $this->conn->rollback();
+			if(!$res){
+				$this->logger->log("DATABASE: Rollback failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    	$this->fail('Unable to begin transaction');
+			}
+		} catch(PDOException $ex){
+			$this->logger->log("DATABASE: Rollback failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+		    $this->fail('Unable to begin transaction');
 		}
 	}
 	

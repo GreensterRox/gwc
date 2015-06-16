@@ -168,6 +168,17 @@ Class green_web_controller {
 		}
 	}
 	
+	public function DBStartTransaction(){
+		$this->DATABASE->startTransaction();
+	}
+	
+	public function DBCommit(){
+		$this->DATABASE->commit();
+	}
+	
+	public function DBRollback(){
+		$this->DATABASE->rollback();
+	}
 	
 	## Cleanup
 	function __destruct() {
