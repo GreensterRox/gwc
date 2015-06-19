@@ -18,11 +18,16 @@ Class green_template {
    	}
    	
    	public function addVar($key,$value){
-   		$this->logger->log('TEMPLATE: Adding variable ['.$key.'] with value ['.$value.']',LOG_LEVEL_VERBOSE);
+   		if(is_object($value)){
+   			$this->logger->log('TEMPLATE: Adding variable ['.$key.'] with value [Object]',LOG_LEVEL_VERBOSE);
+   		} else {
+   			$this->logger->log('TEMPLATE: Adding variable ['.$key.'] with value ['.$value.']',LOG_LEVEL_VERBOSE);
+   		}
    		$this->vars[$key] = $value;
    	}
    	
    	public function render($path){
+   		# TO DO handle header and footer !!
    		if(!empty($this->vars)){
    			extract($this->vars);
    		}
@@ -30,8 +35,9 @@ Class green_template {
    		$this->logger->log('TEMPLATE: Rendering ['.$template.']',LOG_LEVEL_VERBOSE);
    		if(file_exists($template)){
    			include($template);
+   		} else {
+   			$this->fail('Template ['.$template.'] not found');
    		}
-   		$this->fail('Template ['.$template.'] not found');
    	}
    	
    	private function fail($msg){

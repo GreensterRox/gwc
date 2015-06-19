@@ -40,6 +40,7 @@ Class green_database_mysql {
 		return $rows;
 	}
 	
+	# TO DO shopuldn't this use prepared statements like READ above ??
 	public function write($sql){
 		$this->logger->log("DATABASE (write): " . $sql,LOG_LEVEL_VERBOSE);
 		$stmt = $this->conn->query( $sql );
