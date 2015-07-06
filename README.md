@@ -34,7 +34,7 @@
 
 > cd /var/www/gwc
 
-> git clone
+> git clone git@github.com:GreensterRox/gwc.git
 
 2.) Add this line to your apache configuration file (or vhost):
 > php_value auto_prepend_file "/var/www/gwc/controllers/web_controller.php"
