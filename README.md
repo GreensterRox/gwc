@@ -5,7 +5,7 @@
 ### No need to understand database abstraction layers like ORM, just do this:
   > $rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Mr. Grinch'));
   
-  > $rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "GreensterRox", NOW())');
+  > $rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES (:name, :value, NOW())',array(':name'=>'Green Framework Author',':value'=>"GreensterRox"));
   
 ### No need to handle session management, just do this:
   > $key = 'myValue';
@@ -22,10 +22,15 @@
 > $GWC->templatePut('author','GreensterRox');
 	 
 > $GWC->render('unit_test2.html');  // (make sure this file is in your include path)
+
+Access yor variables with <?=$author?> and <?=$title?> inside your unit_test2.html template.
+(Or <?php print $author ?> if not using short tags)
 	 
 ### No need to implement a logger, just do:
 	 
 > $GWC->log('This is a log message');
+
+By default logs get written to /var/log/green_framework/
 
 ### Installation Instructions
 
@@ -36,7 +41,7 @@
 
 > git clone git@github.com:GreensterRox/gwc.git
 
-2.) Add this line to your apache configuration file (or vhost):
+2.) Add this line to your apache configuration file (or vhost), this makes the $GWC variable available to all your scripts:
 > php_value auto_prepend_file "/var/www/gwc/controllers/web_controller.php"
 
 3.) Copy the sample configuration file into a file with the same name as your DNS host and replace the values. 
