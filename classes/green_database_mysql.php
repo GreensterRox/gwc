@@ -40,21 +40,19 @@ Class green_database_mysql {
 		return $rows;
 	}
 	
-	# TO DO shopuldn't this use prepared statements like READ above ??
-	public function write($sql){
-		$this->logger->log("DATABASE (write): " . $sql,LOG_LEVEL_VERBOSE);
-		$stmt = $this->conn->query( $sql );
+	public function write ( $sql, array $params ) {
+		$stmt = $this->conn->prepare($sql);
 		if (!$stmt) {
-		    $this->logger->log("DATABASE: Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+		    $this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		    $result = false;
 		} else {
-			$result = true;
+			$this->logger->log("DATABASE (write): Query succeded: " . $this->renderWithParams($sql,$params),LOG_LEVEL_VERBOSE);
+			$result = $stmt->execute( $params );
 		}
 		return $result;
 	}
 	
 	private function renderWithParams($sql,$params){
-		# TO DO replace params into sql so we can see what is actually being run
 		foreach($params as $k=>$v){
 			# could prob make this better but this'll do for now
 			if(!is_numeric($v)){

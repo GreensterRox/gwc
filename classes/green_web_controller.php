@@ -160,9 +160,9 @@ Class green_web_controller {
 		}
 	}
 	
-	public function DBWrite($sql){
+	public function DBWrite($sql,$params=array()){
 		try{
-			return $this->DATABASE->write($sql);
+			return $this->DATABASE->write($sql,$params);
 		} catch(Exception $ex){
 			return $this->LOGGER->log("Cannot Write to Database: ".$ex->getMessage(),$level=LOG_LEVEL_NORMAL);
 		}

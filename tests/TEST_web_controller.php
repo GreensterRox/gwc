@@ -70,7 +70,7 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		$rs = $GWC->DBWrite('CREATE TABLE IF NOT EXISTS user_test (id int PRIMARY KEY auto_increment,name varchar(64) NOT NULL,value varchar(64) NOT NULL,last_updated datetime NOT NULL) CHARACTER SET utf8;');
 		$this->assertEquals($rs,true);
 		
-		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES (:name, :value, NOW())',array(':name'=>'Green Framework Author',':value'=>"Adrian Green"));
 		$this->assertEquals($rs,true);
 		
 		$rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Adrian Green'));
@@ -101,7 +101,7 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		
 		$GWC->DBStartTransaction();
 		
-		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES (:name, :value, NOW())',array(':name'=>'Green Framework Author',':value'=>"Adrian Green"));		
 		$this->assertEquals($rs,true);
 		
 		$GWC->DBCommit();
@@ -132,7 +132,7 @@ class WebControllerTest extends PHPUnit_Framework_TestCase
 		
 		$GWC->DBStartTransaction();
 			
-		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES ("Green Framework Author", "Adrian Green", NOW())');
+		$rs = $GWC->DBWrite('INSERT INTO user_test (name,value,last_updated) VALUES (:name, :value, NOW())',array(':name'=>'Green Framework Author',':value'=>"Adrian Green"));
 		$this->assertEquals($rs,true);
 		
 		$GWC->DBRollback();
