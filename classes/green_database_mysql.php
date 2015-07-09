@@ -43,11 +43,15 @@ Class green_database_mysql {
 	public function write ( $sql, array $params ) {
 		$stmt = $this->conn->prepare($sql);
 		if (!$stmt) {
-		    $this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+		    $this->logger->log("DATABASE (write): Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		    $result = false;
 		} else {
-			$this->logger->log("DATABASE (write): Query succeded: " . $this->renderWithParams($sql,$params),LOG_LEVEL_VERBOSE);
 			$result = $stmt->execute( $params );
+			if($result){
+				$this->logger->log("DATABASE (write): Query succeded: " . $this->renderWithParams($sql,$params),LOG_LEVEL_VERBOSE);
+			} else {
+				$this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+			}
 		}
 		return $result;
 	}
