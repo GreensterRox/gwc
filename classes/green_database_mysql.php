@@ -42,6 +42,7 @@ Class green_database_mysql {
 	
 	public function write ( $sql, array $params ) {
 		$stmt = $this->conn->prepare($sql);
+		$this->logger->log("DATABASE (write): " . $this->renderWithParams($sql,$params),LOG_LEVEL_VERBOSE);
 		if (!$stmt) {
 		    $this->logger->log("DATABASE (write): Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		    $result = false;
@@ -54,6 +55,10 @@ Class green_database_mysql {
 			}
 		}
 		return $result;
+	}
+	
+	public function lastInsertID() {
+		return $this->conn->lastInsertId();
 	}
 	
 	private function renderWithParams($sql,$params){

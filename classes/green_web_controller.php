@@ -170,6 +170,15 @@ Class green_web_controller {
 		}
 	}
 	
+	public function DBLastInsertID(){
+		try{
+			return $this->DATABASE->lastInsertID();
+		} catch(Exception $ex){
+			$this->LOGGER->log("Cannot Retrieve Last Insert ID from Database: ".$ex->getMessage(),$level=LOG_LEVEL_NORMAL);
+			return false;
+		}
+	}
+	
 	public function DBStartTransaction(){
 		$this->DATABASE->startTransaction();
 	}
