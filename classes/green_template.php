@@ -19,9 +19,9 @@ Class green_template {
    	
    	public function addVar($key,$value){
    		if(is_object($value)){
-   			$this->logger->log('TEMPLATE: Adding variable ['.$key.'] with value [Object]',LOG_LEVEL_VERBOSE);
+   			$this->logger->log('TEMPLATE: Adding variable ['.serialize($key).'] with value [Object]',LOG_LEVEL_VERBOSE);
    		} else {
-   			$this->logger->log('TEMPLATE: Adding variable ['.$key.'] with value ['.$value.']',LOG_LEVEL_VERBOSE);
+   			$this->logger->log('TEMPLATE: Adding variable ['.serialize($key).'] with value ['.serialize($value).']',LOG_LEVEL_VERBOSE);
    		}
    		$this->vars[$key] = $value;
    	}
