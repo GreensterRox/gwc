@@ -2,7 +2,8 @@
 #########################
 ## Main GWC web controller to handle all web requests for all sites
 ## Drives creation of factory classes used by all sites
-## TO DO - handle 4xx & 5xx responses too
+## TODO - handle 4xx & 5xx responses
+## TODO - Template Header & Footer
 ##
 #########################
 define ('LOG_LEVEL_VERBOSE',1);
@@ -193,7 +194,7 @@ Class green_web_controller {
 	
 	## Cleanup
 	function __destruct() {
-       ## Close session at this point, close log handle, close db TO DO
+       ## Close session at this point, close log handle, close db TODO
    }
 };
 ?>

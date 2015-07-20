@@ -25,7 +25,7 @@ Class green_logger {
 		}
 		
 		if(empty($msg)){
-			// use debug backtrace to get name of calling method TO DO
+			// use debug backtrace to get name of calling method TODO
 		}
 		
 		if($this->level == LOG_LEVEL_OUT){
@@ -36,6 +36,7 @@ Class green_logger {
 	}
 	
 	private function formatMessage($msg){
+		# TODO Use session to log the user id (and name) of the user that performed this action
 		return date('H:i:s d/m/Y').$this->sep.$msg."\n";
 	}
 	
