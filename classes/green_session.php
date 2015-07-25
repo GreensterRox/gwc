@@ -20,13 +20,21 @@ Class green_session {
    	}
    	
    	public function put($key,$value){
-   		$this->logger->log('SESSION: Putting key ['.$key.'] | value ['.$value.']',LOG_LEVEL_VERBOSE);
+   		if(is_object($value)){
+   			$this->logger->log('SESSION: Putting key ['.serialize($key).'] with value [Object]',LOG_LEVEL_VERBOSE);
+   		} else {
+   			$this->logger->log('SESSION: Putting key ['.serialize($key).'] with value ['.serialize($value).']',LOG_LEVEL_VERBOSE);
+   		}
    		$_SESSION[$this->name][$key] = $value;
    	}
    	
    	public function get($key){
    		$this->logger->log('SESSION: Getting key ['.$key.'] ',LOG_LEVEL_VERBOSE);
-   		return $_SESSION[$this->name][$key];
+   		if(isset($_SESSION[$this->name][$key])){
+   			return $_SESSION[$this->name][$key];
+   		} else {
+   			return false;
+   		}
    	}
    	
    	# Yes I know not correct way to mock/stub - I needed a quick way to fool phpunit and not have to deal with buffering crap - sue me

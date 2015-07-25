@@ -22,7 +22,8 @@ Class green_web_controller {
 	private $root;
 	private $factories = array('logger','template','database','session');
 	private $siteName = 'unknown_site';
-	
+	private $PRE_RUNNERS = array();
+	private $whitelistResource = false;
 
 	function __construct() {
 		
@@ -31,21 +32,93 @@ Class green_web_controller {
 	public function handleRequest($objects=array()){
 		$this->setRoot();
 		$this->detectSite();
-		if(!empty($objects)){
-			// basically allows me to test in isolation (but we always need the logger!)
-			$this->createLogger();
-			if(isset($objects['template'])){
-				$this->createTemplate();
+		$this->createLogger();
+		$this->flagIfWhitelistResource();
+		# only create the GWC framework if no whitelist resource match
+		if(!$this->whitelistResource){
+			if(!empty($objects)){
+				if(isset($objects['template'])){
+					$this->createTemplate();
+				}
+				if(isset($objects['database'])){
+					$this->createDatabase();
+				}
+				if(isset($objects['session'])){
+					$this->createSession();
+				}
+			} else {
+				$this->createRequestObjects();
 			}
-			if(isset($objects['database'])){
-				$this->createDatabase();
-			}
-			if(isset($objects['session'])){
-				$this->createSession();
-			}
+			$this->handle_auto_prepend_files();
 		} else {
-			$this->createRequestObjects();
+			$this->log(get_class().' Whitelist resource ! Not creating GWC framework',LOG_LEVEL_VERBOSE);
 		}
+	}
+	
+	# Sets a flag if a whitelist type reosurce is detected
+	# prevents us from creating DB connections, sessions for images, css, etc
+	private function flagIfWhitelistResource(){
+		$url = $_SERVER['SCRIPT_URL'];
+		
+   		$patterns = array(
+							'#^/css#',
+							'#^/js#',
+							'#^/images#'
+							);
+		foreach($patterns as $pattern){
+			$this->log(get_class().' Checking url ['.$url.'] for whitelist pattern ['.$pattern.'].',LOG_LEVEL_VERBOSE);
+			preg_match($pattern, $url, $matches);
+			if(count($matches)){
+				$this->log(get_class().' whitelist pattern found ! ['.$matches[0].']',LOG_LEVEL_VERBOSE);
+				$this->whitelistResource = TRUE;
+				break;
+			} else {
+				$this->log(get_class().' whitelist pattern not found ['.$pattern.']',LOG_LEVEL_VERBOSE);
+			}
+		}
+		
+	}
+	
+	public function isWhitelistRequest(){
+		return $this->whitelistResource;
+	}
+	
+	private function handle_auto_prepend_files(){
+		if(isset($this->args['auto_prepend']) && is_array($this->args['auto_prepend'])){
+			$GWC=$this;
+			foreach($this->args['auto_prepend'] as $object => $subData){
+				foreach($subData as $key => $value){
+					$this->_addToPreRunners($object,$key,$value);
+					if($key == 'include_file'){
+						require_once($value);
+						continue;
+					}
+					if($key == 'object_to_retrieve' && isset($$value)){
+						$this->$value = $$value;
+						continue;
+					}
+				}
+			}
+			$this->handle_pre_runners();
+		}
+	}
+	
+	# Handle any prepended objects that need to be run
+	private function handle_pre_runners(){
+		foreach($this->PRE_RUNNERS as $object_name => $data){
+			if(isset($data['run_method']) && !empty($data['run_method'])){
+				if(isset($this->$object_name) && is_object($this->$object_name)){
+					$this->$object_name->$data['run_method']();
+				}
+			}
+		}
+	}
+	
+	private function _addToPreRunners($object,$key,$value){
+		if(!isset($this->PRE_RUNNERS[$object])){
+			$this->PRE_RUNNERS[$object] = array();
+		}
+		$this->PRE_RUNNERS[$object][$key] = $value;
 	}
 	
 	## Using the web request, detect the site
@@ -72,7 +145,6 @@ Class green_web_controller {
 	}
 	
 	private function createRequestObjects(){
-		$this->createLogger();
 		$this->createSession();
 		$this->createTemplate();
 		$this->createDatabase();
