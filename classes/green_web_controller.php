@@ -8,7 +8,7 @@
 #########################
 define ('LOG_LEVEL_VERBOSE',1);
 define ('LOG_LEVEL_NORMAL',2);
-define ('LOG_LEVEL_NONE',3);	# why would you ever need this ??
+define ('LOG_LEVEL_NONE',3);
 define ('LOG_LEVEL_OUT',99);
 
 Class green_web_controller {
@@ -35,7 +35,9 @@ Class green_web_controller {
 		$this->createLogger();
 		$this->flagIfWhitelistResource();
 		# only create the GWC framework if no whitelist resource match
-		if(!$this->whitelistResource){
+		if($this->whitelistResource){
+			$this->send404(get_class().' Whitelist resource ! Resource Not Found ! Not creating GWC framework');
+		} else {
 			if(!empty($objects)){
 				if(isset($objects['template'])){
 					$this->createTemplate();
@@ -49,44 +51,56 @@ Class green_web_controller {
 			} else {
 				$this->createRequestObjects();
 			}
-			$this->handle_auto_prepend_files();
-		} else {
-			$this->log(get_class().' Whitelist resource ! Not creating GWC framework',LOG_LEVEL_VERBOSE);
+			$this->handle_plugins();
 		}
 	}
 	
+	private function send404($msg){
+		$this->log($msg,LOG_LEVEL_VERBOSE);
+		header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found",TRUE,404); 
+		exit;
+	}
+	
 	# Sets a flag if a whitelist type reosurce is detected
-	# prevents us from creating DB connections, sessions for images, css, etc
+	# prevents us from creating DB connections, sessions for broken images, css, etc (as everything is routed !)
 	private function flagIfWhitelistResource(){
-		$url = $_SERVER['SCRIPT_URL'];
-		
-   		$patterns = array(
-							'#^/css#',
-							'#^/js#',
-							'#^/images#'
-							);
-		foreach($patterns as $pattern){
-			$this->log(get_class().' Checking url ['.$url.'] for whitelist pattern ['.$pattern.'].',LOG_LEVEL_VERBOSE);
-			preg_match($pattern, $url, $matches);
-			if(count($matches)){
-				$this->log(get_class().' whitelist pattern found ! ['.$matches[0].']',LOG_LEVEL_VERBOSE);
-				$this->whitelistResource = TRUE;
-				break;
-			} else {
-				$this->log(get_class().' whitelist pattern not found ['.$pattern.']',LOG_LEVEL_VERBOSE);
+		if(isset($_SERVER['SCRIPT_URL'])){
+			$url = $_SERVER['SCRIPT_URL'];
+			
+	   		$patterns = array(
+								'#^/css#',
+								'#^/js#',
+								'#^/images#',
+								'#favicon#',
+								'#\.jpg#',
+								'#\.gif#',
+								'#\.png#',
+								'#\.css#',
+								'#\.js#',
+								'#\.html#'
+								);
+			foreach($patterns as $pattern){
+				$this->log(get_class().' Checking url ['.$url.'] for whitelist pattern ['.$pattern.'].',LOG_LEVEL_VERBOSE);
+				preg_match($pattern, $url, $matches);
+				if(count($matches)){
+					$this->log(get_class().' whitelist pattern found ! ['.$matches[0].']',LOG_LEVEL_VERBOSE);
+					$this->whitelistResource = TRUE;
+					break;
+				} else {
+					$this->log(get_class().' whitelist pattern not found ['.$pattern.']',LOG_LEVEL_VERBOSE);
+				}
 			}
 		}
-		
 	}
 	
 	public function isWhitelistRequest(){
 		return $this->whitelistResource;
 	}
 	
-	private function handle_auto_prepend_files(){
-		if(isset($this->args['auto_prepend']) && is_array($this->args['auto_prepend'])){
+	private function handle_plugins(){
+		if(isset($this->args['plugin']) && is_array($this->args['plugin'])){
 			$GWC=$this;
-			foreach($this->args['auto_prepend'] as $object => $subData){
+			foreach($this->args['plugin'] as $object => $subData){
 				foreach($subData as $key => $value){
 					$this->_addToPreRunners($object,$key,$value);
 					if($key == 'include_file'){
