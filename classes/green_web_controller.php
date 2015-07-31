@@ -52,6 +52,28 @@ Class green_web_controller {
 				$this->createRequestObjects();
 			}
 			$this->handle_plugins();
+			
+			$this->handleURLRouting();
+		}
+	}
+	
+	# Handles User friendly URL Routing
+	# if switched on at config level
+	private function handleURLRouting(){
+		if(isset($this->args['routing']['on']) && $this->args['routing']['on'] === TRUE){
+			if(isset($this->args['routing']['routes_file'])){
+				if(is_file($this->args['routing']['routes_file'])){
+					# we're good to go
+					require_once 'green_routing.php';
+					$URL_Router = new green_routing($this->LOGGER,$this->args['routing']['routes_file']);
+					$URL_Router->matchApplicationRoute($_SERVER['SCRIPT_URI']);
+					$URL_Router->runApplicationRoute($this);
+				} else {
+					throw new Exception('Routes config file cannot be read by GWC framework ['.$this->args['routing']['routes_file'].']');
+				}
+			} else {
+				throw new Exception('You must config a routes file location if you wish to use URL routing');
+			}
 		}
 	}
 	

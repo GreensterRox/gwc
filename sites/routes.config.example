@@ -1,0 +1,14 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; URL Routing Configuration
+;;
+;; Specify the URL and define the path of the Route_Controller class
+;; The path should be relative to your configured include path
+;; The route_controller class can do whatever you want but you must give it a method called run.
+;; The run method will be called whenever a matching URL is found
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+/login 			= Routing/Route_Controllers/Registration/Login_Controller.php,
+/register 		= Routing/Route_Controllers/Registration/Register_Controller.php,
+/settings 		= Routing/Route_Controllers/Settings_Controller.php,
+/dashboard		= Routing/Route_Controllers/Dashboard_Controller.php,
+/log-out		= Routing/Route_Controllers/Registration/Logout_Controller.php,
