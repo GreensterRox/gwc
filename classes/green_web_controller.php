@@ -281,6 +281,14 @@ Class green_web_controller {
 		return $this->SESSION->getSessionId();
 	}
 	
+	public function flash_message($msg){
+		$this->SESSION->flash_message($msg);
+	}
+	
+	public function get_flash_messages(){
+		return $this->SESSION->get_flash_messages();
+	}
+	
 	public function templatePut($key,$value){
 		$this->TEMPLATE->addVar($key,$value);
 	}

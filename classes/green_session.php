@@ -8,6 +8,7 @@ Class green_session {
 	
 	function __construct($name,$logger) {
 		$this->logger = $logger;
+		$this->name = trim($name);
    	}
    	
    	public function start(){
@@ -36,6 +37,25 @@ Class green_session {
    			return false;
    		}
    	}
+   	
+   	public function flash_message($msg){
+		if(!empty($msg)){
+			if(!isset($_SESSION[$this->name]['FLASH_MESSAGES'])){
+				$_SESSION[$this->name]['FLASH_MESSAGES'] = array();
+			}
+			$_SESSION[$this->name]['FLASH_MESSAGES'][] = $msg;
+		}
+		return true;
+	}
+	
+	public function get_flash_messages(){
+		$messages = array();
+		if(isset($_SESSION[$this->name]['FLASH_MESSAGES'])){
+			$messages = $_SESSION[$this->name]['FLASH_MESSAGES'];
+		}
+		unset ($_SESSION[$this->name]['FLASH_MESSAGES']);
+		return $messages;
+	}
    	
    	# Yes I know not correct way to mock/stub - I needed a quick way to fool phpunit and not have to deal with buffering crap - sue me
    	public function mock(){
