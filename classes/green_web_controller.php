@@ -51,10 +51,38 @@ Class green_web_controller {
 			} else {
 				$this->createRequestObjects();
 			}
+			$this->handleOptions();
+			
 			$this->handle_plugins();
 			
 			$this->handleURLRouting();
 		}
+	}
+	
+	private function handleOptions(){
+		if(isset($this->args['options']['CSRF_protection']) && ($this->args['options']['CSRF_protection'] == TRUE)){
+			$this->handleNoCSRF();
+		}
+	}
+	
+	private function handleNoCSRF(){
+		require_once('green_nocsrf.php');
+		# first look for forms
+		if(!empty($_POST) && count($_POST) > 0){
+			try {
+				NoCSRF::check( 'gwc_csrf', $_POST, true, 60*10, false );
+			}
+			catch (Exception $e){
+				throw new Exception ('Invalid form request detected');
+			}
+		}
+		
+		# generate token
+		$this->CSRF_TOKEN = NoCSRF::generate( 'gwc_csrf' );
+	}
+	
+	public function CSRF_protection(){
+		return '<input type="hidden" name="gwc_csrf" value="'.$this->CSRF_TOKEN.'">';
 	}
 	
 	# Handles User friendly URL Routing
