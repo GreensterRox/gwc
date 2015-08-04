@@ -293,8 +293,18 @@ Class green_web_controller {
 		$this->TEMPLATE->addVar($key,$value);
 	}
 	
-	public function render($path){
-		return $this->TEMPLATE->render($path);
+	public function render($path,$showHeaderAndFooter=TRUE,$override_header=false,$override_footer=false){
+		if($override_header){
+			$this->TEMPLATE->setHeaderTemplate($override_header);
+		}
+		if($override_footer){
+			$this->TEMPLATE->setFooterTemplate($override_footer);
+		}
+		$this->TEMPLATE->render($path,$showHeaderAndFooter);
+	}
+	
+	public function show($path){
+		$this->TEMPLATE->render($path,FALSE);
 	}
 	
 	public function DBRead($sql,$params=array()){

@@ -5,6 +5,8 @@ Class green_template {
 	private $name;
 	private $logger;
 	private $templateDir;
+	private $headerTemplate;
+	private $footerTemplate;
 	private $vars;
 	
 	function __construct($name,$logger,$templateDir) {
@@ -26,17 +28,42 @@ Class green_template {
    		$this->vars[$key] = $value;
    	}
    	
-   	public function render($path){
-   		# TO DO handle header and footer !!
+   	public function setHeaderTemplate($filepath){
+   		$this->logger->log('TEMPLATE: Global Header template ['.$filepath.']',LOG_LEVEL_VERBOSE);
+   		$this->headerTemplate = $filepath;
+   	}
+   	
+   	public function setFooterTemplate($filepath){
+   		$this->logger->log('TEMPLATE: Global Footer template ['.$filepath.']',LOG_LEVEL_VERBOSE);
+   		$this->footerTemplate = $filepath;
+   	}
+   	
+   	public function render($path,$showHeaderAndFooter){
    		if(!empty($this->vars)){
    			extract($this->vars);
    		}
    		$template = $this->templateDir.$path;
-   		$this->logger->log('TEMPLATE: Rendering ['.$template.']',LOG_LEVEL_VERBOSE);
-   		if(file_exists($template)){
-   			include($template);
-   		} else {
+   		$this->logger->log('TEMPLATE: Rendering of ['.$template.'] requested',LOG_LEVEL_VERBOSE);
+   		if(!$showHeaderAndFooter){
+   			$this->logger->log('TEMPLATE: NOT Rendering Header/Footer',LOG_LEVEL_VERBOSE);
+   		}
+   		if($showHeaderAndFooter && !empty($this->headerTemplate) && !file_exists($this->headerTemplate)){
+   			$this->fail('Header Template ['.$this->headerTemplate.'] not found');
+   		} elseif($showHeaderAndFooter && $this->headerTemplate) {
+   			$this->logger->log('TEMPLATE: Rendering Header ['.$this->headerTemplate.']',LOG_LEVEL_VERBOSE);
+   			include($this->headerTemplate);
+   		}
+   		if(!file_exists($template)){
    			$this->fail('Template ['.$template.'] not found');
+   		} else {
+   			$this->logger->log('TEMPLATE: Rendering ['.$template.']',LOG_LEVEL_VERBOSE);
+   			include($template);
+   		}
+   		if($showHeaderAndFooter && !empty($this->footerTemplate) && !file_exists($this->footerTemplate)){
+   			$this->fail('Footer Template ['.$this->footerTemplate.'] not found');
+   		} elseif($showHeaderAndFooter && $this->footerTemplate) {
+   			$this->logger->log('TEMPLATE: Rendering Footer ['.$this->footerTemplate.']',LOG_LEVEL_VERBOSE);
+   			include($this->footerTemplate);
    		}
    	}
    	
