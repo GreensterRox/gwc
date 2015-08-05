@@ -24,6 +24,7 @@ Class green_web_controller {
 	private $siteName = 'unknown_site';
 	private $PRE_RUNNERS = array();
 	private $whitelistResource = false;
+	private $CSRF_protection = false;
 
 	function __construct() {
 		
@@ -61,6 +62,7 @@ Class green_web_controller {
 	
 	private function handleOptions(){
 		if(isset($this->args['options']['CSRF_protection']) && ($this->args['options']['CSRF_protection'] == TRUE)){
+			$this->CSRF_protection = true;
 			$this->handleNoCSRF();
 		}
 	}
@@ -82,7 +84,9 @@ Class green_web_controller {
 	}
 	
 	public function CSRF_protection(){
-		return '<input type="hidden" name="gwc_csrf" value="'.$this->CSRF_TOKEN.'">';
+		if($this->CSRF_protection){
+			return '<input type="hidden" name="gwc_csrf" value="'.$this->CSRF_TOKEN.'">';
+		}
 	}
 	
 	# Handles User friendly URL Routing
@@ -281,12 +285,12 @@ Class green_web_controller {
 		return $this->SESSION->getSessionId();
 	}
 	
-	public function flash_message($msg){
-		$this->SESSION->flash_message($msg);
+	public function flash_message($msg,$error=false){
+		$this->SESSION->flash_message($msg,$error);
 	}
 	
-	public function get_flash_messages(){
-		return $this->SESSION->get_flash_messages();
+	public function get_flash_messages($errors=false){
+		return $this->SESSION->get_flash_messages($errors);
 	}
 	
 	public function templatePut($key,$value){

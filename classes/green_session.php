@@ -38,22 +38,32 @@ Class green_session {
    		}
    	}
    	
-   	public function flash_message($msg){
+   	public function flash_message($msg,$error){
 		if(!empty($msg)){
-			if(!isset($_SESSION[$this->name]['FLASH_MESSAGES'])){
-				$_SESSION[$this->name]['FLASH_MESSAGES'] = array();
+			if($error){
+				$keyname = 'FLASH_ERRORS';
+			} else {
+				$keyname = 'FLASH_MESSAGES';
 			}
-			$_SESSION[$this->name]['FLASH_MESSAGES'][] = $msg;
+			if(!isset($_SESSION[$this->name][$keyname])){
+				$_SESSION[$this->name][$keyname] = array();
+			}
+			$_SESSION[$this->name][$keyname][] = $msg;
 		}
 		return true;
 	}
 	
-	public function get_flash_messages(){
+	public function get_flash_messages($error){
 		$messages = array();
-		if(isset($_SESSION[$this->name]['FLASH_MESSAGES'])){
-			$messages = $_SESSION[$this->name]['FLASH_MESSAGES'];
+		if($error){
+			$keyname = 'FLASH_ERRORS';
+		} else {
+			$keyname = 'FLASH_MESSAGES';
 		}
-		unset ($_SESSION[$this->name]['FLASH_MESSAGES']);
+		if(isset($_SESSION[$this->name][$keyname])){
+			$messages = $_SESSION[$this->name][$keyname];
+		}
+		unset ($_SESSION[$this->name][$keyname]);
 		return $messages;
 	}
    	
