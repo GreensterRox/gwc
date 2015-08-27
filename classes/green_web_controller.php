@@ -350,6 +350,11 @@ Class green_web_controller {
 		$this->DATABASE->rollback();
 	}
 	
+	public function redirect($target){
+		header('Location: '.$target);
+	   	exit;
+	}
+	
 	## Cleanup
 	function __destruct() {
        ## Close session at this point, close log handle, close db TODO
