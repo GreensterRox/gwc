@@ -228,6 +228,12 @@ Class green_web_controller {
 		$logLevel = $this->getLogLevel($this->debug);
 		$this->LOGGER = green_logger_factory::create($this->siteName,$logLevel,$args);
 	}	
+	
+	# TODO a better way would be to use 
+	# override options somehow but I ain't got time for that now
+	public function setLogger($LoggerObj){
+		$this->LOGGER = $LoggerObj;
+	}
 		
 	private function createSession(){
 		include_once 'green_session_factory.php';
