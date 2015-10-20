@@ -231,6 +231,7 @@ Class green_web_controller {
 	
 	# TODO a better way would be to use 
 	# override options somehow but I ain't got time for that now
+	# Also need to override the logger objects already 'passed into' DB, Template, Session !!
 	public function setLogger($LoggerObj){
 		$this->LOGGER = $LoggerObj;
 	}

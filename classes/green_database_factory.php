@@ -15,7 +15,7 @@ Class green_database_factory {
 		# required args
 		foreach(array('server','name','username','password') as $required){
 			if(!isset($args[$required])){
-				throw new Excpetion ('You must supply a value for ['.$required.'] in your site config');
+				throw new Exception ('You must supply a value for ['.$required.'] in your site config');
 			}
 		}
 		
