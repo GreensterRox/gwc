@@ -1,4 +1,4 @@
-#THIS IS WORK IN PROGRESS - please come back soon :-)
+#THIS IS WORK IN PROGRESS - please come back very soon :-)
 
 #The Green Web Framework is an Ultra Lightweight PHP Web Framework for rapid development of web sites !
 
