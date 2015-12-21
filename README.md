@@ -45,3 +45,6 @@ By default logs get written to /var/log/green_framework/
 
 3.) Copy the sample configuration file into a file with the same name as your DNS host and replace the values. 
 > cp /var/www/gwc/sites/fake-site.co.uk.config.php /var/www/gwc/sites/${yourhost.com}.config.php
+
+4.) Put the GWC include path in you PHP ini
+> sed -i '$ a include_path = ".:/var/www/gwc/classes:/var/www/gwc/tests"' /etc/php5/apache2/php.ini
