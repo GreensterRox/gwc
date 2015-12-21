@@ -1,6 +1,5 @@
-#THIS IS WORK IN PROGRESS - please come back very soon :-)
-
 #The Green Web Framework is an Ultra Lightweight PHP Web Framework for rapid development of web sites !
+##Intended audience: Tech professionals who are already proficient with PHP & Apache.
 
 ### No need to understand database abstraction layers like ORM, just do this:
   > $rs = $GWC->DBRead('SELECT * FROM user_test WHERE value = :value',array(':value' => 'Mr. Grinch'));
