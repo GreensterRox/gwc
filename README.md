@@ -1,5 +1,6 @@
 #The Green Web Framework is an Ultra Lightweight PHP Web Framework for rapid development of web sites !
 ##Intended audience: Tech professionals who are already proficient with PHP & Apache.
+##Note: Currently only supports MySQL & MariaDB
 
 ### Follow the installation instructions below and you'll get a variable called $GWC available in all your PHP scripts. This variable allows you to read and write to a database, manage session variables, render templates and write logs.
 The GWC framework will also allow you to map URL routes to specific classes giving you massive flexibility when writing websites and enhancing your delivery time.
