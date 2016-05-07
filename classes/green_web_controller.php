@@ -199,6 +199,9 @@ Class green_web_controller {
 	}
 	
 	private function loadProps($name){
+		if(substr($name,0,4) == 'www.'){
+			$name = substr($name,4)	;
+		}
 		$siteConfig = $this->root.'/sites/'.$name.'.config.php';
 		if(!file_exists($siteConfig)){
 			throw new Exception('Cannot find site config file here: '.$this->root.'/sites/'.$name.'.config.php');
