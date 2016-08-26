@@ -98,8 +98,12 @@ Class green_web_controller {
 					# we're good to go
 					require_once 'green_routing.php';
 					$URL_Router = new green_routing($this->LOGGER,$this->args['routing']['routes_file']);
-					$URL_Router->matchApplicationRoute($_SERVER['SCRIPT_URI']);
-					$URL_Router->runApplicationRoute($this);
+					$route_found = $URL_Router->matchApplicationRoute($_SERVER['SCRIPT_URI']);
+					if($route_found){
+						$URL_Router->runApplicationRoute($this);
+					} else {
+						$this->send404(get_class().' Not a valid route');
+					}
 				} else {
 					throw new Exception('Routes config file cannot be read by GWC framework ['.$this->args['routing']['routes_file'].']');
 				}
@@ -112,6 +116,7 @@ Class green_web_controller {
 	private function send404($msg){
 		$this->log($msg,LOG_LEVEL_VERBOSE);
 		header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found",TRUE,404); 
+		echo "<h1>NOT FOUND</h1>";
 		exit;
 	}
 	

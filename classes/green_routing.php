@@ -52,7 +52,9 @@ Class green_routing {
    		
    		if(empty($this->routeController)){
    			$this->logger->log(get_class().' No matching route found for ['.$path.']',LOG_LEVEL_VERBOSE);
+   			return false;
    		}
+   		return true;
    	}
    	
    	public function runApplicationRoute($GWC){
