@@ -9,10 +9,12 @@ try {
 	$GWC = new green_web_controller();
 	$GWC->handleRequest();
 } catch(Exception $ex){
+	//die('Cannot load website right now.  :-(');
 	die('need an elegant way of handling this - hard coded template or somming, etc ['.$ex.']');
 }
 
 function gwc_exception_handler($exception){
+	//die('Unhandled exception! Cannot load website right now ;-(');
 	die('Unhandled exception caught. Need an elegant way of handling this - hard coded template or somming, etc ['.$exception->getMessage().']');
 }
 ?>

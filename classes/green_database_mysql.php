@@ -24,7 +24,7 @@ Class green_database_mysql {
 	}
 	
 	public function lastError(){
-		
+		// not needed, handled by exception catcher in web_controller
 	}
 	
 	public function read ( $sql, array $params ) {

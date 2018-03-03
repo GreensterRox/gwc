@@ -46,6 +46,6 @@
 	# Forces each and every form on the site to pass back the GWC->CSRF_TOKEN
 	# in a hidden form field called 'gwc_csrf'
 	# Simply put <?=$GWC->CSRF_protection()?> inside your FORM tags
-	$CONFIG['options']['CSRF_protection'] = TRUE;
+	# $CONFIG['options']['CSRF_protection'] = TRUE;
 	
 ?>
