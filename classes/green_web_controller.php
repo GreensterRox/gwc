@@ -200,7 +200,7 @@ Class green_web_controller {
 		if(empty($_SERVER['HTTP_HOST'])){
 			throw new Exception ('Unable to detect site host');
 		}
-		$this->siteName = preg_replace('/(\:[0-9])+$/', '', $_SERVER['HTTP_HOST']);
+		$this->siteName = preg_replace('/\:[0-9]+$/', '', $_SERVER['HTTP_HOST']);
 		$this->loadProps($this->siteName);
 	}
 	
