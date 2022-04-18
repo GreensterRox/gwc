@@ -5,34 +5,63 @@ Class green_logger {
 	private $path;
 	private $sep;
 	private $level = LOG_LEVEL_NORMAL;
+	private $lastMessageLogged;
+	private $messageBuffer=array();
 	
-	function __construct($name,$logLevel,$sep='^') {
+	function __construct($name,$args,$sep='^') {
 		$this->sep=$sep;
-		$this->buildPath($name);
-		$this->level=$logLevel;
+		$this->buildPath($args,$name);
+		if(isset($args['level'])){
+			$this->level=(int)$args['level'];	
+		}
    	}
 	
-	private function buildPath($name){
+	private function buildPath($args,$name){
 		if(empty($name)){
-			throw new Exception('Framework Failure - missing required data (Green Logger expects a log file name)');
+			throw new Exception('Framework Failure - missing required data (Green Logger expects a log file name & log directory)');
 		}
-		$this->path = '/var/log/green_framework/'.$name.'.log';
+		$logDir = '/var/log/green_framework/';
+		if(isset($args['directory'])){
+			$logDir = $args['directory'];
+		}
+		$this->path = $logDir.$name.'.log';
 	}
 	
-	public function log($msg,$level=LOG_LEVEL_NORMAL){
-		if($level > 4 || $level < 1){
-			$level = LOG_LEVEL_NORMAL;
+	public function log($msg,$levelOfMessage=LOG_LEVEL_NORMAL){
+		if($levelOfMessage > 5 || $levelOfMessage < 1){
+			$levelOfMessage = LOG_LEVEL_NORMAL;
 		}
 		
 		if(empty($msg)){
 			// use debug backtrace to get name of calling method TODO
 		}
 		
-		if($this->level == LOG_LEVEL_OUT){
-			print $this->formatMessage($msg);
-		} elseif($level >= $this->level && $this->level != LOG_LEVEL_NONE){
-			return error_log ($this->formatMessage($msg),3,$this->path);
+		$suffix='';
+		switch($this->level){
+			case LOG_LEVEL_SYSOUT:
+				print "\n".">>>>>".$this->formatMessage($msg.$this->sep.'(SYSOUT)');
+				break;
+			case LOG_LEVEL_NONE:
+				// do nothing
+				break;
+			case LOG_LEVEL_TEMPLATE_FOOTER:
+				// TO DO
+				$this->messageBuffer[] = $this->formatMessage($msg.$suffix);
+				return TRUE;
+			case LOG_LEVEL_VERBOSE:
+				$suffix = $this->sep.'(VERBOSE)';
+			case LOG_LEVEL_NORMAL:
+				if(empty($suffix)){
+					$suffix = $this->sep.'(NORMAL)';
+				}
+				if($levelOfMessage >= $this->level){
+					$this->lastMessageLogged=$msg.$suffix;
+					return error_log ($this->formatMessage($msg.$suffix),3,$this->path);
+				}
+				break;
 		}
+		
+		return true;
 	}
 	
 	private function formatMessage($msg){
@@ -40,6 +69,13 @@ Class green_logger {
 		return date('H:i:s d/m/Y').$this->sep.$msg."\n";
 	}
 	
+	public function getLastMessageLogged(){
+		return $this->lastMessageLogged;
+	}
+	
+	public function getMessageBuffer(){
+		return $this->messageBuffer;
+	}
 };
 
 ?>

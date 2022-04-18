@@ -55,3 +55,23 @@ By default logs get written to /var/log/green_framework/
 
 5.) NOTE. You do not need to pull the GWC files into your own web application folder. The GWC should live in a separate directory to your website. Once you've done steps 1-4 return to your index.php page and start using the magic $GWC variable.
 
+### Unit tests with PhpUnit
+
+1.) Install composer
+
+https://getcomposer.org/download/
+
+```
+/c/php/php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+/c/php/php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+/c/php/php composer-setup.php
+/c/php/php -r "unlink('composer-setup.php');"
+```
+
+2.) Install phpunit
+
+``` /c/php/php composer.phar require phpunit/phpunit ```
+
+3.) Run tests (requires db connection and pre-installed schema) TO DO add instructions for creating db
+
+``` /c/php/php -f ./vendor/bin/phpunit tests/TEST_web_controller.php ```

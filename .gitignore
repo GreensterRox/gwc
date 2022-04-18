@@ -4,3 +4,7 @@
 /sites/project-x.greenhat-solutions.co.uk.config.php
 /sites/project-x.local.config.php
 /sites/project-x.greenhat-solutions.co.uk.config.php
+*/secrets/*
+composer*
+vendor/*
+tests/resources/fake-site.co.uk/logs/

@@ -6,10 +6,6 @@
 ## TODO - Template Header & Footer
 ##
 #########################
-define ('LOG_LEVEL_VERBOSE',1);
-define ('LOG_LEVEL_NORMAL',2);
-define ('LOG_LEVEL_NONE',3);
-define ('LOG_LEVEL_OUT',99);
 
 Class green_web_controller {
 
@@ -18,7 +14,6 @@ Class green_web_controller {
 	protected $DATABASE;
 	protected $SESSION;
 	private $args;
-	private $debug;
 	private $root;
 	private $factories = array('logger','template','database','session');
 	private $siteName = 'unknown_site';
@@ -41,6 +36,12 @@ Class green_web_controller {
 			$this->send404(get_class().' Whitelist resource ! Resource Not Found ! Not creating GWC framework');
 		} else {
 			if(!empty($objects)){
+				if(isset($objects['logger'])){	// allows me to override logger specifically
+					if(!empty($objects['logger'])){
+						$this->args['logger']=$objects['logger'];
+						$this->createLogger();
+					}
+				}
 				if(isset($objects['template'])){
 					$this->createTemplate();
 				}
@@ -212,13 +213,28 @@ Class green_web_controller {
 		if(!file_exists($siteConfig)){
 			throw new Exception('Cannot find site config file here: '.$this->root.'/sites/'.$name.'.config.php');
 		}
-		include($siteConfig);
+		require($siteConfig);
+		$this->loadConstants($CONFIG['constants'] ? $CONFIG['constants'] : array());
 		$this->args = $CONFIG;
-		$this->debug = (isset($this->args['options']['debug']) ? $this->args['options']['debug'] : false);
+	}
+	
+	private function loadConstants($constants){
+		foreach($constants as $name => $val){
+			if(!defined($name)){
+				define($name,$val);		
+			}
+		}
+		
 	}
 	
 	private function setRoot(){
-		$this->root = str_replace('classes/green_web_controller.php','',__FILE__);
+		$pattern = '/Windows/';
+		preg_match($pattern, php_uname(), $matches);
+		if(count($matches)){
+			$this->root = str_replace('classes\green_web_controller.php','',__FILE__);
+		} else {
+			$this->root = str_replace('classes/green_web_controller.php','',__FILE__);
+		}
 	}
 	
 	private function createRequestObjects(){
@@ -234,8 +250,7 @@ Class green_web_controller {
 		} else {
 			$args=array();
 		}
-		$logLevel = $this->getLogLevel($this->debug);
-		$this->LOGGER = green_logger_factory::create($this->siteName,$logLevel,$args);
+		$this->LOGGER = green_logger_factory::create($this->siteName,$args);
 	}	
 	
 	# TODO a better way would be to use 
@@ -273,16 +288,6 @@ Class green_web_controller {
 			$args=array();
 		}
 		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,$args);
-	}
-	
-	
-	private function getLogLevel($debug){
-		if($debug){
-			##return LOG_LEVEL_OUT;
-			return LOG_LEVEL_VERBOSE;
-		} else {
-			return LOG_LEVEL_NORMAL;
-		}
 	}
 	
 	public function log($msg,$level=LOG_LEVEL_NORMAL){

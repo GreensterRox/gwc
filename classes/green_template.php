@@ -51,19 +51,31 @@ Class green_template {
    			$this->fail('Header Template ['.$this->headerTemplate.'] not found');
    		} elseif($showHeaderAndFooter && $this->headerTemplate) {
    			$this->logger->log('TEMPLATE: Rendering Header ['.$this->headerTemplate.']',LOG_LEVEL_VERBOSE);
-   			include($this->headerTemplate);
+   			try{
+   				include($this->headerTemplate);
+   			} catch(Exception $ex){
+   				$this->logger->log('TEMPLATE: Error when rendering header  ['.$ex.']',LOG_LEVEL_NORMAL);
+   			}
    		}
    		if(!file_exists($template)){
    			$this->fail('Template ['.$template.'] not found');
    		} else {
    			$this->logger->log('TEMPLATE: Rendering ['.$template.']',LOG_LEVEL_VERBOSE);
-   			include($template);
+   			try{
+   				include($template);
+   			} catch(Exception $ex){
+   				$this->logger->log('TEMPLATE: Error when rendering template  ['.$ex.']',LOG_LEVEL_NORMAL);
+   			}
    		}
    		if($showHeaderAndFooter && !empty($this->footerTemplate) && !file_exists($this->footerTemplate)){
    			$this->fail('Footer Template ['.$this->footerTemplate.'] not found');
    		} elseif($showHeaderAndFooter && $this->footerTemplate) {
    			$this->logger->log('TEMPLATE: Rendering Footer ['.$this->footerTemplate.']',LOG_LEVEL_VERBOSE);
-   			include($this->footerTemplate);
+   			try{
+   				include($this->footerTemplate);
+   			} catch(Exception $ex){
+   				$this->logger->log('TEMPLATE: Error when rendering footer  ['.$ex.']',LOG_LEVEL_NORMAL);
+   			}
    		}
    	}
    	
