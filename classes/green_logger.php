@@ -44,10 +44,6 @@ Class green_logger {
 			case LOG_LEVEL_NONE:
 				// do nothing
 				break;
-			case LOG_LEVEL_TEMPLATE_FOOTER:
-				// TO DO
-				$this->messageBuffer[] = $this->formatMessage($msg.$suffix);
-				return TRUE;
 			case LOG_LEVEL_VERBOSE:
 				$suffix = $this->sep.'(VERBOSE)';
 			case LOG_LEVEL_NORMAL:
@@ -59,6 +55,9 @@ Class green_logger {
 					return error_log ($this->formatMessage($msg.$suffix),3,$this->path);
 				}
 				break;
+			case LOG_LEVEL_TEMPLATE_FOOTER:
+				$this->messageBuffer[] = $this->formatMessage($msg.$suffix);
+				return TRUE;
 		}
 		
 		return true;

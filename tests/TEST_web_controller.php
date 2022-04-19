@@ -129,11 +129,30 @@ class TEST_web_controller extends PHPUnit\Framework\TestCase
 		$GWC->templatePut('author','Adrian Green');
 		ob_start();
 		$GWC->render('unit_test.html');
-		$contents = ob_get_clean();
+		$contents = str_replace(array("\r", "\n"), '', ob_get_clean());
 		$this->assertEquals('<html><head><title>GWC Unit Test Template</title></head><body>GWC Framework by Adrian Green</body><footer>This is the footer</footer></html>',$contents);
+		
+		
+		# Test we can render template with log messages automatically appended
 		
 	}
 	
+	public function testWeCanRenderTemplateWithAppendedLogMessages(){
+		
+		$GWC = new green_web_controller();
+		$GWC->handleRequest(array('template'=>true,'logger'=>array('level'=>LOG_LEVEL_TEMPLATE_FOOTER)));
+		
+		# Test we can render from a template and render variables
+		$GWC->templatePut('title','GWC');
+		$GWC->templatePut('author','Adrian Green');
+		ob_start();
+		$GWC->render('unit_test.html');
+		$contents = str_replace(array("\r", "\n"), '', ob_get_clean());
+		$this->assertStringContainsString('class="logmsg"',$contents);
+		
+	}
+	
+	// TO DO - tests below here need a functioning database
 	/*public function testWeCanReadAndWriteDatabase(){
 		
 		$GWC = new green_web_controller($debug=true);

@@ -1,1 +1,11 @@
-<footer>This is the footer</footer></html>
+<footer>This is the footer</footer>
+<?php if($log_messages) { ?>
+	<footer>
+		<table>
+		<?php foreach($log_messages as $msg){ ?>
+			<tr><td class="logmsg"><?=trim($msg)?></td></tr>
+		<?php } ?>
+		</table>
+	</footer>
+<?php } ?>
+</html>

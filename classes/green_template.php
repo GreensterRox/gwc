@@ -72,6 +72,7 @@ Class green_template {
    		} elseif($showHeaderAndFooter && $this->footerTemplate) {
    			$this->logger->log('TEMPLATE: Rendering Footer ['.$this->footerTemplate.']',LOG_LEVEL_VERBOSE);
    			try{
+   				$log_messages = $this->logger->getMessageBuffer();
    				include($this->footerTemplate);
    			} catch(Exception $ex){
    				$this->logger->log('TEMPLATE: Error when rendering footer  ['.$ex.']',LOG_LEVEL_NORMAL);

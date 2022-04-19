@@ -23,7 +23,7 @@
 	#			1 = VERBOSE = log everything / including every database query / make sure to rotate your log files as these will get big
 	#			2 = NORMAL = log normally / important events are logged as well as errors
 	#			3 = NONE = log nothing
-	#			4 = VERBOSE_TEMPLATE_FOOTER = log everything as VERBOSE but instead of logging to a file it will render to template_footer
+	#			4 = TEMPLATE_FOOTER = log everything as VERBOSE but instead of logging to a file it will render to template_footer
 	#			5 = VERBOSE_SYSOUT = log everything as VERBOSE but instead of logging to a file it will send to standard out (console)
 	##########################
 	$CONFIG['logger']['directory'] = 'D:\Websites\GIT_Repos\green_framework\tests\resources\fake-site.co.uk\logs\\';
