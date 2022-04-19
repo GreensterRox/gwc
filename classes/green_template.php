@@ -80,6 +80,16 @@ Class green_template {
    		}
    	}
    	
+   	public function renderFooter(){
+   		$this->logger->log('TEMPLATE: Rendering Footer directly ['.$this->footerTemplate.']',LOG_LEVEL_VERBOSE);
+   			try{
+   				$log_messages = $this->logger->getMessageBuffer();
+   				include($this->footerTemplate);
+   			} catch(Exception $ex){
+   				$this->logger->log('TEMPLATE: Error when rendering footer  ['.$ex.']',LOG_LEVEL_NORMAL);
+   			}
+   	}
+   	
    	private function fail($msg){
    		$this->logger->log('TEMPLATE: '.$msg);
    		throw new Exception($msg);

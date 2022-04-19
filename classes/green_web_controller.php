@@ -328,6 +328,10 @@ Class green_web_controller {
 		$this->TEMPLATE->render($path,$showHeaderAndFooter);
 	}
 	
+	public function renderFooter(){
+		$this->TEMPLATE->renderFooter();
+	}
+	
 	public function show($path){
 		$this->TEMPLATE->render($path,FALSE);
 	}
