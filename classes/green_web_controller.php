@@ -23,9 +23,9 @@ Class green_web_controller {
 	private $lastDBError = false;
 
 	function __construct() {
-		
+
    	}
-	
+
 	public function handleRequest($objects=array()){
 		$this->setRoot();
 		$this->detectSite();
@@ -55,20 +55,20 @@ Class green_web_controller {
 				$this->createRequestObjects();
 			}
 			$this->handleOptions();
-			
+
 			$this->handle_plugins();
-			
+
 			$this->handleURLRouting();
 		}
 	}
-	
+
 	private function handleOptions(){
 		if(isset($this->args['options']['CSRF_protection']) && ($this->args['options']['CSRF_protection'] == TRUE)){
 			$this->CSRF_protection = true;
 			$this->handleNoCSRF();
 		}
 	}
-	
+
 	private function handleNoCSRF(){
 		require_once('green_nocsrf.php');
 		# first look for forms
@@ -80,17 +80,17 @@ Class green_web_controller {
 				throw new Exception ('Invalid form request detected');
 			}
 		}
-		
+
 		# generate token
 		$this->CSRF_TOKEN = NoCSRF::generate( 'gwc_csrf' );
 	}
-	
+
 	public function CSRF_protection(){
 		if($this->CSRF_protection){
 			return '<input type="hidden" name="gwc_csrf" value="'.$this->CSRF_TOKEN.'">';
 		}
 	}
-	
+
 	# Handles User friendly URL Routing
 	# if switched on at config level
 	private function handleURLRouting(){
@@ -114,20 +114,20 @@ Class green_web_controller {
 			}
 		}
 	}
-	
+
 	private function send404($msg){
 		$this->log($msg,LOG_LEVEL_VERBOSE);
-		header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found",TRUE,404); 
+		header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found",TRUE,404);
 		echo "<h1>NOT FOUND</h1>";
 		exit;
 	}
-	
+
 	# Sets a flag if a whitelist type reosurce is detected
 	# prevents us from creating DB connections, sessions for broken images, css, etc (as everything is routed !)
 	private function flagIfWhitelistResource(){
 		if(isset($_SERVER['SCRIPT_URL'])){
 			$url = $_SERVER['SCRIPT_URL'];
-			
+
 	   		$patterns = array(
 								'#^/css#',
 								'#^/js#',
@@ -153,11 +153,11 @@ Class green_web_controller {
 			}
 		}
 	}
-	
+
 	public function isWhitelistRequest(){
 		return $this->whitelistResource;
 	}
-	
+
 	private function handle_plugins(){
 		if(isset($this->args['plugin']) && is_array($this->args['plugin'])){
 			$GWC=$this;
@@ -177,7 +177,7 @@ Class green_web_controller {
 			$this->handle_pre_runners();
 		}
 	}
-	
+
 	# Handle any prepended objects that need to be run
 	private function handle_pre_runners(){
 		foreach($this->PRE_RUNNERS as $object_name => $data){
@@ -188,14 +188,14 @@ Class green_web_controller {
 			}
 		}
 	}
-	
+
 	private function _addToPreRunners($object,$key,$value){
 		if(!isset($this->PRE_RUNNERS[$object])){
 			$this->PRE_RUNNERS[$object] = array();
 		}
 		$this->PRE_RUNNERS[$object][$key] = $value;
 	}
-	
+
 	## Using the web request, detect the site
 	private function detectSite(){
 		if(empty($_SERVER['HTTP_HOST'])){
@@ -204,29 +204,33 @@ Class green_web_controller {
 		$this->siteName = preg_replace('/\:[0-9]+$/', '', $_SERVER['HTTP_HOST']);
 		$this->loadProps($this->siteName);
 	}
-	
+
 	private function loadProps($name){
 		if(substr($name,0,4) == 'www.'){
 			$name = substr($name,4)	;
 		}
 		$siteConfig = $this->root.'/sites/'.$name.'.config.php';
 		if(!file_exists($siteConfig)){
-			throw new Exception('Cannot find site config file here: '.$this->root.'/sites/'.$name.'.config.php');
+			// fall back to static production file
+			$siteConfig = $this->root.'/sites/production.config.php';
+			if(!file_exists($siteConfig)){
+				throw new Exception('Cannot find site config file here: '.$this->root.'/sites/'.$name.'.config.php');
+			}
 		}
 		require($siteConfig);
 		$this->loadConstants($CONFIG['constants'] ? $CONFIG['constants'] : array());
 		$this->args = $CONFIG;
 	}
-	
+
 	private function loadConstants($constants){
 		foreach($constants as $name => $val){
 			if(!defined($name)){
-				define($name,$val);		
+				define($name,$val);
 			}
 		}
-		
+
 	}
-	
+
 	private function setRoot(){
 		$pattern = '/Windows/';
 		preg_match($pattern, php_uname(), $matches);
@@ -236,13 +240,13 @@ Class green_web_controller {
 			$this->root = str_replace('classes/green_web_controller.php','',__FILE__);
 		}
 	}
-	
+
 	private function createRequestObjects(){
 		$this->createSession();
 		$this->createTemplate();
 		$this->createDatabase();
 	}
-	
+
 	private function createLogger(){
 		include_once 'green_logger_factory.php';
 		if(isset($this->args['logger'])){
@@ -251,15 +255,15 @@ Class green_web_controller {
 			$args=array();
 		}
 		$this->LOGGER = green_logger_factory::create($this->siteName,$args);
-	}	
-	
-	# TODO a better way would be to use 
+	}
+
+	# TODO a better way would be to use
 	# override options somehow but I ain't got time for that now
 	# Also need to override the logger objects already 'passed into' DB, Template, Session !!
 	public function setLogger($LoggerObj){
 		$this->LOGGER = $LoggerObj;
 	}
-		
+
 	private function createSession(){
 		include_once 'green_session_factory.php';
 		if(isset($this->args['session'])){
@@ -269,7 +273,7 @@ Class green_web_controller {
 		}
 		$this->SESSION = green_session_factory::create($this->siteName,$this->LOGGER,$args);
 	}
-	
+
 	private function createTemplate(){
 		include_once 'green_template_factory.php';
 		if(isset($this->args['template'])){
@@ -279,7 +283,7 @@ Class green_web_controller {
 		}
 		$this->TEMPLATE = green_template_factory::create($this->siteName,$this->LOGGER,$args);
 	}
-	
+
 	private function createDatabase(){
 		include_once 'green_database_factory.php';
 		if(isset($this->args['database'])){
@@ -289,35 +293,35 @@ Class green_web_controller {
 		}
 		$this->DATABASE = green_database_factory::create($this->siteName,$this->LOGGER,$args);
 	}
-	
+
 	public function log($msg,$level=LOG_LEVEL_NORMAL){
 		return $this->LOGGER->log($msg,$level=LOG_LEVEL_NORMAL);
 	}
-	
+
 	public function sessionPut($key,$value){
 		$this->SESSION->put($key,$value);
 	}
-	
+
 	public function sessionGet($key){
 		return $this->SESSION->get($key);
 	}
-	
+
 	public function sessionId(){
 		return $this->SESSION->getSessionId();
 	}
-	
+
 	public function flash_message($msg,$error=false){
 		$this->SESSION->flash_message($msg,$error);
 	}
-	
+
 	public function get_flash_messages($errors=false){
 		return $this->SESSION->get_flash_messages($errors);
 	}
-	
+
 	public function templatePut($key,$value){
 		$this->TEMPLATE->addVar($key,$value);
 	}
-	
+
 	public function render($path,$showHeaderAndFooter=TRUE,$override_header=false,$override_footer=false){
 		if($override_header){
 			$this->TEMPLATE->setHeaderTemplate($override_header);
@@ -327,15 +331,15 @@ Class green_web_controller {
 		}
 		$this->TEMPLATE->render($path,$showHeaderAndFooter);
 	}
-	
+
 	public function renderFooter(){
 		$this->TEMPLATE->renderFooter();
 	}
-	
+
 	public function show($path){
 		$this->TEMPLATE->render($path,FALSE);
 	}
-	
+
 	public function DBRead($sql,$params=array()){
 		try {
 			return $this->DATABASE->read($sql,$params);
@@ -345,7 +349,7 @@ Class green_web_controller {
 			return false;
 		}
 	}
-	
+
 	public function DBWrite($sql,$params=array()){
 		try{
 			return $this->DATABASE->write($sql,$params);
@@ -355,7 +359,7 @@ Class green_web_controller {
 			return false;
 		}
 	}
-	
+
 	public function DBLastInsertID(){
 		try{
 			return $this->DATABASE->lastInsertID();
@@ -365,28 +369,28 @@ Class green_web_controller {
 			return false;
 		}
 	}
-	
+
 	public function DBStartTransaction(){
 		$this->DATABASE->startTransaction();
 	}
-	
+
 	public function DBCommit(){
 		$this->DATABASE->commit();
 	}
-	
+
 	public function DBRollback(){
 		$this->DATABASE->rollback();
 	}
-	
+
 	public function DBLastError(){
 		return $this->lastDBError;
 	}
-	
+
 	public function redirect($target){
 		header('Location: '.$target);
 	   	exit;
 	}
-	
+
 	## Cleanup
 	function __destruct() {
        ## Close session at this point, close log handle, close db TODO
