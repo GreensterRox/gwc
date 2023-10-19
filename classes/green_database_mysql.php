@@ -4,69 +4,105 @@ Class green_database_mysql {
 
 	private $logger;
 	private $conn;
+	private $server;
+	private $database_name;
+	private $username;
+	private $password;
 
-	function __construct($logger) {
+	function __construct($logger,$args) {
 		$this->logger = $logger;
+		$this->server = $args['server'];
+		$this->database_name = $args['name'];
+		$this->username = $args['username'];
+		$this->password = $args['password'];
    	}
 
 	// See: https://github.com/adriengibrat/Simple-Database-PHP-Class/blob/master/Db.php
 	// http://wiki.hashphp.org/PDO_Tutorial_for_MySQL_Developers
-	public function connect($dbServer,$dbName,$dbUsername,$dbPassword){
-		$this->logger->log('DATABASE: Connecting to ['.$dbUsername.'@'.$dbServer.'/'.$dbName.'] ',LOG_LEVEL_VERBOSE);
+	private function connect(){
+		if(empty($this->conn)){
+			$this->logger->log('DATABASE: Connecting to ['.$this->username.'@'.$this->server.'/'.$this->database_name.'] ',LOG_LEVEL_VERBOSE);
 
-		try {
-			$this->conn = new pdo('mysql:host='.$dbServer.';dbname='.$dbName, $dbUsername, $dbPassword, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION) );
-			$this->conn->exec('SET NAMES UTF8');
-		} catch (PDOException $ex){
-			$this->logger->log("DATABASE: Connection failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
-		    $this->fail('Unable to connect to the database - please check the settings');
+			try {
+				$this->conn = new pdo('mysql:host='.$this->server.';dbname='.$this->database_name, $this->username, $this->password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION) );
+				$this->conn->exec('SET NAMES UTF8');
+			} catch (PDOException $ex){
+				$this->logger->log("DATABASE: Connection failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+			    $this->fail('Unable to connect to the database - please check the settings');
+			}
+		} else {
+			$this->logger->log('DATABASE: Connection already established ',LOG_LEVEL_VERBOSE);
 		}
+
+
 	}
 
 	public function lastError(){
 		// not needed, handled by exception catcher in web_controller
 	}
 
+	// TODO Susceptable to SQL Injection through dynamic ORDER BY (and other suffix clauses) - anything dynamic MUST be passed through this class?? Figure out how to fix this. Needs testing to validate this assumption
 	public function read ( $sql, array $params ) {
 		$timer_start = microtime(true);
-		$log_message = "DATABASE (read): " . $this->renderWithParams($sql,$params);
+		$rended_query = "DATABASE (read): " . $this->renderWithParams($sql,$params);
+		$this->connect();
 		$stmt = $this->conn->prepare($sql);
+		$success=false;
 		if (!$stmt) {
-		    $this->logger->log("DATABASE: Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+		    $this->logger->log("Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		    $rows = false;
 		} else {
+			try{
 			$stmt->execute( $params );
 			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$success=true;
+			} catch(Exception $ex){
+				$this->logger->log("DATABASE (read): Failed - Exception: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+			}
 		}
 		$timer_stop = microtime(true);
-		$log_message .= "</td><td>".($timer_stop-$timer_start)." secs";
+		if($success){
+			$timing = number_format(($timer_stop-$timer_start),5)." secs";
+		} else {
+			$timing = '<b><font color="red">FAIL</font></b>';
+		}
+		$log_message = $rended_query."|".$timing;
 		$this->logger->log($log_message,LOG_LEVEL_VERBOSE);
 		return $rows;
 	}
 
-
+	// TODO Susceptable to SQL Injection through dynamic ORDER BY (and other suffix clauses) - anything dynamic MUST be passed through this class?? Figure out how to fix this. Needs testing to validate this assumption
 	public function write ( $sql, array $params ) {
 		$timer_start = microtime(true);
+		$this->connect();
 		$stmt = $this->conn->prepare($sql);
-		$log_message = "DATABASE (write): " . $this->renderWithParams($sql,$params);
+		$rended_query = "DATABASE (write): " . $this->renderWithParams($sql,$params);
+		$result = false;
 		if (!$stmt) {
-		    $this->logger->log("DATABASE (write): Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
-		    $result = false;
+		    $this->logger->log("Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		} else {
+			try {
 			$result = $stmt->execute( $params );
-			if($result){
-				$this->logger->log("DATABASE (write): Query succeded: " . $this->renderWithParams($sql,$params),LOG_LEVEL_VERBOSE);
-			} else {
+				if(!$result){
 				$this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+			}
+			} catch(Exception $ex){
+				$this->logger->log("DATABASE (write): Failed - Exception: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
 			}
 		}
 		$timer_stop = microtime(true);
-		$log_message .= "</td><td>".($timer_stop-$timer_start)." secs";
+		if($result){
+			$timing = number_format(($timer_stop-$timer_start),5)." secs";
+		} else {
+			$timing = '<b><font color="red">FAIL</font></b>';
+		}
+		$log_message = $rended_query."|".$timing;
 		$this->logger->log($log_message,LOG_LEVEL_VERBOSE);
 		return $result;
 	}
 
 	public function lastInsertID() {
+		$this->connect();
 		return $this->conn->lastInsertId();
 	}
 
@@ -83,6 +119,7 @@ Class green_database_mysql {
 	}
 
 	public function startTransaction(){
+		$this->connect();
 		$this->logger->log("DATABASE (startTransaction): ",LOG_LEVEL_VERBOSE);
 		try {
 			$res = $this->conn->beginTransaction();

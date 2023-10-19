@@ -1,11 +1,11 @@
 <?php
 
 Class green_database_factory {
-	
+
 	function __construct() {
-		
+
    	}
-	
+
 	public static function create($name,$logger,$args){
 		$technology = 'mysql';
 		# optional args
@@ -18,13 +18,12 @@ Class green_database_factory {
 				throw new Exception ('You must supply a value for ['.$required.'] in your site config');
 			}
 		}
-		
+
 		switch($technology){
 			case 'mysql':
 				$className = 'green_database_mysql';
 				include_once($className.'.php');
-				$DB = new green_database_mysql($logger);
-				$DB->connect($args['server'],$args['name'],$args['username'],$args['password']);
+				$DB = new green_database_mysql($logger,$args);
 				return $DB;
 				break;
 			default:
@@ -32,7 +31,7 @@ Class green_database_factory {
 				break;
 		}
 	}
-	
+
 };
 
 ?>
