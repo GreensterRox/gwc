@@ -218,7 +218,8 @@ Class green_web_controller {
 			}
 		}
 		require($siteConfig);
-		$this->loadConstants($CONFIG['constants'] ? $CONFIG['constants'] : array());
+		$constants = $CONFIG['constants'] ?? array();
+		$this->loadConstants($constants);
 		$this->args = $CONFIG;
 	}
 
