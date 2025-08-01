@@ -22,10 +22,8 @@ Class green_database_mysql {
 	private function connect(){
 		if(empty($this->conn)){
 			$this->logger->log('DATABASE: Connecting to ['.$this->username.'@'.$this->server.'/'.$this->database_name.'] ',LOG_LEVEL_VERBOSE);
-
 			try {
-				$this->conn = new pdo('mysql:host='.$this->server.';dbname='.$this->database_name, $this->username, $this->password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION) );
-				$this->conn->exec('SET NAMES UTF8');
+				$this->conn = new pdo('mysql:host='.$this->server.';dbname='.$this->database_name.';charset=utf8mb4', $this->username, $this->password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4") );
 			} catch (PDOException $ex){
 				$this->logger->log("DATABASE: Connection failed: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
 			    $this->fail('Unable to connect to the database - please check the settings');

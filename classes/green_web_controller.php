@@ -21,6 +21,7 @@ Class green_web_controller {
 	private $whitelistResource = false;
 	private $CSRF_protection = false;
 	private $lastDBError = false;
+	private $bypass_session = false;
 
 	function __construct() {
 
@@ -35,6 +36,10 @@ Class green_web_controller {
 		if($this->whitelistResource){
 			$this->send404(get_class().' Whitelist resource ! Resource Not Found ! Not creating GWC framework');
 		} else {
+			$this->handleOptions();
+
+			$this->handle_plugins();
+			
 			if(!empty($objects)){
 				if(isset($objects['logger'])){	// allows me to override logger specifically
 					if(!empty($objects['logger'])){
@@ -54,9 +59,6 @@ Class green_web_controller {
 			} else {
 				$this->createRequestObjects();
 			}
-			$this->handleOptions();
-
-			$this->handle_plugins();
 
 			$this->handleURLRouting();
 		}
@@ -66,6 +68,9 @@ Class green_web_controller {
 		if(isset($this->args['options']['CSRF_protection']) && ($this->args['options']['CSRF_protection'] == TRUE)){
 			$this->CSRF_protection = true;
 			$this->handleNoCSRF();
+		}
+		if(isset($this->args['options']['Session_Required']) && ($this->args['options']['Session_Required'] == FALSE)){
+			$this->bypass_session = true;
 		}
 	}
 
@@ -266,13 +271,17 @@ Class green_web_controller {
 	}
 
 	private function createSession(){
-		include_once 'green_session_factory.php';
-		if(isset($this->args['session'])){
-			$args = $this->args['session'];
+		if(isset($this->bypass_session) && $this->bypass_session === TRUE){
+			return;
 		} else {
-			$args=array();
+			include_once 'green_session_factory.php';
+			if(isset($this->args['session'])){
+				$args = $this->args['session'];
+			} else {
+				$args=array();
+			}
+			$this->SESSION = green_session_factory::create($this->siteName,$this->LOGGER,$args);
 		}
-		$this->SESSION = green_session_factory::create($this->siteName,$this->LOGGER,$args);
 	}
 
 	private function createTemplate(){
