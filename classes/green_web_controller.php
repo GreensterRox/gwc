@@ -401,6 +401,10 @@ Class green_web_controller {
 	   	exit;
 	}
 
+	public function getLogMessages(){
+		return $this->LOGGER->getMessageBuffer();
+	}
+
 	## Cleanup
 	function __destruct() {
        ## Close session at this point, close log handle, close db TODO

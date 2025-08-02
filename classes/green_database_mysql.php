@@ -41,6 +41,7 @@ Class green_database_mysql {
 
 	// TODO Susceptable to SQL Injection through dynamic ORDER BY (and other suffix clauses) - anything dynamic MUST be passed through this class?? Figure out how to fix this. Needs testing to validate this assumption
 	public function read ( $sql, array $params ) {
+		$rows = false;
 		$timer_start = microtime(true);
 		$rended_query = "DATABASE (read): " . $this->renderWithParams($sql,$params);
 		$this->connect();
@@ -48,7 +49,6 @@ Class green_database_mysql {
 		$success=false;
 		if (!$stmt) {
 		    $this->logger->log("Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
-		    $rows = false;
 		} else {
 			try{
 			$stmt->execute( $params );
@@ -80,10 +80,10 @@ Class green_database_mysql {
 		    $this->logger->log("Prepare Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 		} else {
 			try {
-			$result = $stmt->execute( $params );
+				$result = $stmt->execute( $params );
 				if(!$result){
-				$this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
-			}
+					$this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
+				}
 			} catch(Exception $ex){
 				$this->logger->log("DATABASE (write): Failed - Exception: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
 			}
