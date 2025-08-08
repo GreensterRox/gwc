@@ -84,10 +84,12 @@ Class green_database_mysql {
 			try {
 				$result = $stmt->execute( $params );
 				if(!$result){
+					$this->lastError=$this->conn->error;
 					$this->logger->log("DATABASE (write): Query failed: " . $this->conn->error,LOG_LEVEL_NORMAL);
 				}
 			} catch(Exception $ex){
-				$this->logger->log("DATABASE (write): Failed - Exception: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+				$this->lastError=$ex->getMessage();
+				$this->logger->log("DATABASE (write): Failed - Exception: " . $this->lastError,LOG_LEVEL_NORMAL);
 			}
 		}
 		$timer_stop = microtime(true);
