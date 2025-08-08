@@ -20,7 +20,6 @@ Class green_web_controller {
 	private $PRE_RUNNERS = array();
 	private $whitelistResource = false;
 	private $CSRF_protection = false;
-	private $lastDBError = false;
 	private $bypass_session = false;
 
 	function __construct() {
@@ -354,8 +353,7 @@ Class green_web_controller {
 		try {
 			return $this->DATABASE->read($sql,$params);
 		} catch(Exception $ex){
-			$this->lastDBError = $ex->getMessage();
-			$this->LOGGER->log("Cannot Read from Database: ".$this->lastDBError,$level=LOG_LEVEL_NORMAL);
+			$this->LOGGER->log("Cannot Read from Database: ",$level=LOG_LEVEL_NORMAL);
 			return false;
 		}
 	}
@@ -364,8 +362,7 @@ Class green_web_controller {
 		try{
 			return $this->DATABASE->write($sql,$params);
 		} catch(Exception $ex){
-			$this->lastDBError = $ex->getMessage();
-			$this->LOGGER->log("Cannot Write to Database: ".$this->lastDBError,$level=LOG_LEVEL_NORMAL);
+			$this->LOGGER->log("Cannot Write to Database: ",$level=LOG_LEVEL_NORMAL);
 			return false;
 		}
 	}
@@ -374,8 +371,7 @@ Class green_web_controller {
 		try{
 			return $this->DATABASE->lastInsertID();
 		} catch(Exception $ex){
-			$this->lastDBError = $ex->getMessage();
-			$this->LOGGER->log("Cannot Retrieve Last Insert ID from Database: ".$this->lastDBError,$level=LOG_LEVEL_NORMAL);
+			$this->LOGGER->log("Cannot Retrieve Last Insert ID from Database: ",$level=LOG_LEVEL_NORMAL);
 			return false;
 		}
 	}
@@ -393,7 +389,7 @@ Class green_web_controller {
 	}
 
 	public function DBLastError(){
-		return $this->lastDBError;
+		return $this->DATABASE->lastError();
 	}
 
 	public function redirect($target){

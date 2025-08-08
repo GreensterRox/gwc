@@ -8,6 +8,7 @@ Class green_database_mysql {
 	private $database_name;
 	private $username;
 	private $password;
+	private $lastError;
 
 	function __construct($logger,$args) {
 		$this->logger = $logger;
@@ -36,7 +37,7 @@ Class green_database_mysql {
 	}
 
 	public function lastError(){
-		// not needed, handled by exception catcher in web_controller
+		return $this->lastError;
 	}
 
 	// TODO Susceptable to SQL Injection through dynamic ORDER BY (and other suffix clauses) - anything dynamic MUST be passed through this class?? Figure out how to fix this. Needs testing to validate this assumption
@@ -55,7 +56,8 @@ Class green_database_mysql {
 			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				$success=true;
 			} catch(Exception $ex){
-				$this->logger->log("DATABASE (read): Failed - Exception: " . $ex->getMessage(),LOG_LEVEL_NORMAL);
+				$this->lastError=$ex->getMessage();
+				$this->logger->log("DATABASE (read): Failed - Exception: " . $this->lastError,LOG_LEVEL_NORMAL);
 			}
 		}
 		$timer_stop = microtime(true);
