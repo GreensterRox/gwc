@@ -24,6 +24,9 @@ Class green_logger {
 		if(isset($args['directory'])){
 			$logDir = $args['directory'];
 		}
+		if(isset($args['name'])){
+			$name = $args['name'];
+		}
 		$this->path = $logDir.$name.'.log';
 	}
 	
