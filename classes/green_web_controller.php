@@ -37,8 +37,6 @@ Class green_web_controller {
 		} else {
 			$this->handleOptions();
 
-			$this->handle_plugins();
-			
 			if(!empty($objects)){
 				if(isset($objects['logger'])){	// allows me to override logger specifically
 					if(!empty($objects['logger'])){
@@ -59,6 +57,8 @@ Class green_web_controller {
 				$this->createRequestObjects();
 			}
 
+			$this->handle_plugins();
+			
 			$this->handleURLRouting();
 		}
 	}
@@ -172,8 +172,12 @@ Class green_web_controller {
 						require_once($value);
 						continue;
 					}
-					if($key == 'object_to_retrieve' && isset($$value)){
-						$this->$value = $$value;
+					if($key == 'object_to_retrieve'){
+						require_once($value);			
+						$ControllerClassName = substr(basename($value),0,-4);
+						$ControllerObject = new $ControllerClassName($GWC);
+						$this->log(get_class().' Running plugin ['.$ControllerClassName.']',LOG_LEVEL_VERBOSE);
+						$ControllerObject->run();
 						continue;
 					}
 				}

@@ -60,8 +60,8 @@ Class green_routing {
    	public function runApplicationRoute($GWC){
    		if(!empty($this->routeController)){
 	   		require_once($this->routeController);
-	   		$ConrollerClassName = substr(basename($this->routeController),0,-4);
-	   		$ControllerObject = new $ConrollerClassName($GWC);
+	   		$ControllerClassName = substr(basename($this->routeController),0,-4);
+	   		$ControllerObject = new $ControllerClassName($GWC);
 	   		$this->logger->log(get_class().' Running application Route ['.$this->routeController.']',LOG_LEVEL_VERBOSE);
 	   		$ControllerObject->run();
 	   		exit;
