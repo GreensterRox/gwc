@@ -16,7 +16,7 @@ Class green_template {
 			$this->fail('No template directory configured for this site ['.$name.']');
 		}
 		$this->templateDir = $templateDir;
-		$this->logger->log('TEMPLATE: Initialising template engine using root directory ['.$templateDir.']',LOG_LEVEL_VERBOSE);
+		//$this->logger->log('TEMPLATE: Initialising template engine using root directory ['.$templateDir.']',LOG_LEVEL_VERBOSE);
    	}
    	
    	public function addVar($key,$value){
@@ -29,12 +29,12 @@ Class green_template {
    	}
    	
    	public function setHeaderTemplate($filepath){
-   		$this->logger->log('TEMPLATE: Global Header template ['.$filepath.']',LOG_LEVEL_VERBOSE);
+   		//$this->logger->log('TEMPLATE: Global Header template ['.$filepath.']',LOG_LEVEL_VERBOSE);
    		$this->headerTemplate = $filepath;
    	}
    	
    	public function setFooterTemplate($filepath){
-   		$this->logger->log('TEMPLATE: Global Footer template ['.$filepath.']',LOG_LEVEL_VERBOSE);
+   		//$this->logger->log('TEMPLATE: Global Footer template ['.$filepath.']',LOG_LEVEL_VERBOSE);
    		$this->footerTemplate = $filepath;
    	}
    	

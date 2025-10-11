@@ -145,14 +145,14 @@ Class green_web_controller {
 								'#\.html#'
 								);
 			foreach($patterns as $pattern){
-				$this->log(get_class().' Checking url ['.$url.'] for whitelist pattern ['.$pattern.'].',LOG_LEVEL_VERBOSE);
+				//$this->log(get_class().' Checking url ['.$url.'] for whitelist pattern ['.$pattern.'].',LOG_LEVEL_VERBOSE);
 				preg_match($pattern, $url, $matches);
 				if(count($matches)){
-					$this->log(get_class().' whitelist pattern found ! ['.$matches[0].']',LOG_LEVEL_VERBOSE);
+					//$this->log(get_class().' whitelist pattern found ! ['.$matches[0].']',LOG_LEVEL_VERBOSE);
 					$this->whitelistResource = TRUE;
 					break;
 				} else {
-					$this->log(get_class().' whitelist pattern not found ['.$pattern.']',LOG_LEVEL_VERBOSE);
+					//$this->log(get_class().' whitelist pattern not found ['.$pattern.']',LOG_LEVEL_VERBOSE);
 				}
 			}
 		}
